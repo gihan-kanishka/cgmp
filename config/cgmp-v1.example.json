@@ -11,14 +11,41 @@
   "time_rate_per_min": 12.0,
   "platform_commission_rate": 0.07,
   "pickup": {
-    "consent_threshold_km": 2.0,
-    "charge_time": false
+    "reference_consent_threshold_km": 2.0,
+    "charge_time": false,
+    "passenger_standing_authorization": {
+      "enabled": true,
+      "max_pickup_distance_km": null,
+      "max_pickup_cost": null,
+      "require_explicit_approval_if_outside_saved_limits": true
+    }
   },
   "sealed_bidding": {
     "enabled": true,
     "passenger_max_hidden": true,
     "driver_bids_hidden": true,
-    "selection_rule": "lowest_qualifying_bid"
+    "selection_rule": "first_qualifying_bid",
+    "qualifying_rule": "baseline_fare <= bid <= passenger_max",
+    "clear_immediately": true,
+    "authoritative_order": "server_receipt_order",
+    "passenger_saved_fallback_ceiling": {
+      "enabled": false,
+      "max_total_fare": null
+    },
+    "driver_auto_bid": {
+      "enabled": true,
+      "manual_numeric_bidding_while_moving": false,
+      "inputs": [
+        "pickup_eta_minutes",
+        "pickup_distance_km",
+        "trip_distance_km",
+        "trip_duration_minutes",
+        "road_condition",
+        "destination",
+        "time_of_day",
+        "minimum_acceptable_economics"
+      ]
+    }
   },
   "long_distance": {
     "enabled": true,
