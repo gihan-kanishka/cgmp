@@ -10,7 +10,9 @@
 
 Cost-Grounded Mobility Pricing (CGMP) is an open ride-hailing fare framework that separates ordinary transport pricing from exceptional scarcity resolution.
 
-Instead of continuously modifying passenger fares using opaque supply-demand multipliers, CGMP computes a baseline fare from published vehicle-distance, driver-time, pickup and necessary long-distance displacement components. If that baseline does not attract a driver, a sealed-bid fallback allows the market to discover an exceptional clearing price without exposing the passenger's maximum willingness to pay or competing driver bids.
+Instead of continuously modifying passenger fares using opaque supply-demand multipliers, CGMP computes a baseline fare from published vehicle-distance, driver-time, pickup and necessary long-distance displacement components. If that baseline does not attract a driver, a sealed fallback allows the market to clear within a passenger-chosen private ceiling without exposing that ceiling or competing driver offers.
+
+CGMP prioritizes dispatch speed in the fallback stage: the first server-valid private driver offer that satisfies the baseline and passenger ceiling immediately receives the trip. Driver offers can be generated automatically from private preferences configured while parked, and passengers can pre-authorize pickup and fallback limits to avoid unnecessary interaction.
 
 The framework is intended to improve transparency, reduce arbitrary pricing discretion, make driver compensation more legible, and create a testable alternative to conventional surge-based pricing.
 
@@ -25,6 +27,7 @@ Ride-hailing pricing must balance several competing objectives:
 - pickups create real operating cost even before the passenger boards;
 - long-distance trips can create unavoidable displacement;
 - scarcity sometimes makes a normal fare insufficient to attract a driver;
+- dispatch must remain fast enough for time-sensitive trips;
 - pricing systems can create behavioural incentives, including incentives related to speed, route choice and trip duration.
 
 A pricing system that relies heavily on dynamic scarcity multipliers can clear markets, but it can also make the reason for a fare change difficult to distinguish from the platform's own pricing discretion.
@@ -109,18 +112,26 @@ Estimated total
 
 If congestion adds expected journey time, the platform can show that additional time and its price effect before acceptance.
 
-## 6. Pickup pricing
+## 6. Pickup pricing and passenger preferences
 
 Pickup distance is charged at the ordinary class distance rate.
 
-The v1.0-draft consent rule is:
+The reference modelling threshold is **2 km**, but CGMP does not require a separate approval modal every time a pickup exceeds that distance.
 
-- up to 2 km: pickup cost may be incorporated automatically;
-- over 2 km: the passenger must explicitly approve the additional pickup distance/cost before dispatch.
+Passengers may configure standing authorization rules using variables such as:
+
+- maximum pickup distance;
+- maximum pickup cost.
+
+If a candidate pickup falls within the passenger's saved authorization, the request can proceed without another interaction. The app should still disclose the actual pickup distance and charge.
+
+If the requested pickup exceeds the saved limits, explicit passenger approval is required before dispatch.
 
 Pickup time is not separately charged under the draft.
 
 The chargeable route should be server-calculated and not derived solely from a driver-controlled distance counter.
+
+This design treats standing passenger preferences as prospective informed consent while reducing checkout friction.
 
 ## 7. Long-distance displacement
 
@@ -128,34 +139,73 @@ CGMP does not guarantee a driver full round-trip economics.
 
 The ordinary fare compensates the outbound trip. A separate provision may be added only for necessary displacement created by the trip, such as accommodation or defined meal support where an immediate safe return is unreasonable.
 
-Any such provision must be rule-derived, disclosed and accepted before the trip.
+Any such provision must be rule-derived, disclosed and accepted before the trip, either directly or under a valid pre-authorized rule.
 
 CGMP does not automatically add hypothetical future wages, guaranteed round-trip profit, or an unrestricted empty-return allowance.
 
-If the baseline remains unattractive after legitimate displacement costs are included, the trip proceeds to market price discovery rather than receiving an arbitrary automatic multiplier.
+If the baseline remains unattractive after legitimate displacement costs are included, the trip proceeds to market clearing rather than receiving an arbitrary automatic multiplier.
 
-## 8. Sealed-bid market clearing
+## 8. First-qualifying sealed dispatch
 
 Normal dispatch occurs first at the published baseline.
 
 If no eligible driver accepts:
 
-1. the passenger may set a private maximum total fare;
-2. drivers receive the trip details and submit private bids;
+1. the passenger uses a private maximum total fare, either set for the trip or stored as an optional standing fallback ceiling;
+2. eligible driver apps evaluate the request using their driver's private pricing preferences;
 3. drivers cannot see the passenger's maximum;
-4. drivers cannot see other drivers' bids;
-5. the system selects the lowest valid bid not exceeding the passenger maximum;
-6. if no bid qualifies, no match occurs unless the passenger voluntarily raises the ceiling.
+4. drivers cannot see other drivers' offers;
+5. the first server-valid offer satisfying `baseline <= bid <= passenger maximum` immediately clears the trip;
+6. if no offer qualifies, no match occurs unless the passenger voluntarily changes the ceiling.
 
 This produces:
 
 ```text
-baseline <= winning bid <= passenger maximum
+baseline <= clearing offer <= passenger maximum
 ```
 
-The passenger pays the winning bid, not automatically the ceiling.
+The passenger pays the clearing offer, not automatically the ceiling.
 
-The mechanism allows supply and demand to influence exceptional trips while preventing the platform from needing to invent a universal surge multiplier.
+Unlike a conventional sealed auction, CGMP does not wait for a bidding window to close and then search for the lowest offer. Once the passenger has already chosen the maximum they are willing to pay, the fallback objective is **fast dispatch within that affordability boundary**.
+
+### 8.1 Driver-side automatic pricing
+
+Drivers should configure fallback pricing preferences during signup or while parked.
+
+A private pricing function may consider:
+
+- estimated arrival time to the passenger;
+- pickup distance;
+- trip distance;
+- expected trip duration;
+- road or terrain conditions;
+- destination;
+- time of day;
+- minimum acceptable earnings or margin.
+
+When a fallback request arrives, the app or platform can evaluate those saved rules and submit the driver's private offer automatically.
+
+A production implementation should not require manual numerical bidding while the driver is actively operating a vehicle.
+
+### 8.2 Passenger-side automatic limits
+
+Passengers may configure standing preferences such as:
+
+- maximum pickup distance;
+- maximum pickup charge;
+- optional maximum fallback total fare.
+
+If the relevant conditions remain inside those private limits, dispatch can proceed without an additional confirmation step.
+
+The final pickup charge, fallback use and clearing fare should still be visible to the passenger.
+
+### 8.3 Dispatch-order fairness
+
+Because the first qualifying offer wins, authoritative ordering is important.
+
+A production implementation should send the fallback opportunity to the relevant candidate group at effectively the same dispatch epoch where practical, use server-controlled receipt timestamps or another documented ordering rule, and monitor whether device/network latency systematically advantages particular drivers.
+
+This is a measurable implementation risk rather than a reason to delay every fallback transaction.
 
 ## 9. Manipulation resistance
 
@@ -168,15 +218,17 @@ Recommended controls include:
 - published pricing parameters;
 - server-side route and distance calculation;
 - timestamp and movement validation;
-- pre-trip approval of exceptional charges;
+- standing passenger authorization with auditable preference versions;
+- pre-trip approval of exceptional charges where standing authorization does not apply;
 - hidden passenger ceiling;
-- sealed driver bids;
-- lowest-valid-bid selection;
+- sealed private driver offers;
+- first-qualifying server-side clearing;
+- authoritative offer-order records;
 - repeated-pattern analysis for deliberate route stretching or crawling;
 - repeated-pattern analysis for speeding/aggressive driving;
 - complaint review supported by telemetry rather than automatic punishment;
 - detection of chronic unsupported passenger complaints;
-- monitoring for coordinated bid/rejection behaviour.
+- monitoring for coordinated baseline rejection or bid behaviour.
 
 The framework should therefore be described as manipulation-resistant, not immune to manipulation.
 
@@ -209,7 +261,8 @@ A credible implementation should publish:
 - platform commission;
 - pickup policy;
 - long-distance rules;
-- bidding rules;
+- fallback-dispatch rules;
+- dispatch-order methodology;
 - parameter-change history;
 - calibration methodology.
 
@@ -225,15 +278,20 @@ A pilot should compare it with an existing pricing system using predefined metri
 - driver net earnings after operating costs;
 - acceptance rate;
 - cancellation rate;
-- match time;
+- normal-dispatch match time;
+- fallback activation-to-assignment latency;
+- percentage of fallback requests clearing on the first qualifying offer;
+- distribution of fallback assignments among eligible drivers;
+- relationship between network latency and fallback win rate;
 - speeding events;
 - aggressive-driving complaints;
 - unexplained excess journey time;
 - slow-driving complaints;
 - pickup acceptance by distance;
-- share of trips entering sealed bidding;
-- sealed-bid clearing premium;
-- bidding failure rate;
+- percentage of pickups handled by standing passenger authorization;
+- share of trips entering sealed fallback dispatch;
+- fallback clearing premium relative to baseline;
+- fallback failure rate;
 - long-distance acceptance and completion.
 
 A randomized or carefully matched control design is preferable.
@@ -248,7 +306,7 @@ Operators may adapt parameters to local conditions. Material deviations from the
 
 ## 15. Conclusion
 
-CGMP is best understood as a hybrid of cost-grounded ordinary pricing and market-based exceptional price discovery.
+CGMP is best understood as a hybrid of cost-grounded ordinary pricing and market-based exceptional clearing.
 
 Its central architecture is:
 
@@ -259,11 +317,15 @@ normal dispatch
         ↓
 if baseline fails
         ↓
-private passenger ceiling + sealed driver bids
+private passenger ceiling
++
+private automated driver pricing rules
         ↓
-lowest qualifying bid
+first qualifying sealed offer
+        ↓
+immediate assignment
 ```
 
-The framework's value does not depend on any single rupee-per-kilometre figure. Its contribution is the separation of ordinary trip economics from scarcity resolution, combined with explicit consent, auditable pricing inputs and a competitive fallback.
+The framework's value does not depend on any single rupee-per-kilometre figure. Its contribution is the separation of ordinary trip economics from scarcity resolution, combined with configurable consent, auditable pricing inputs, private willingness limits and fast market clearing.
 
 Whether this architecture performs better than incumbent models is a question for empirical testing.
