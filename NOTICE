@@ -1,0 +1,12 @@
+Cost-Grounded Mobility Pricing (CGMP)
+Copyright 2026 CGMP contributors
+
+Software and reference implementation: Apache License 2.0.
+
+Unless a file states otherwise, written documentation, specifications,
+white-paper text and diagrams are licensed under Creative Commons
+Attribution 4.0 International (CC BY 4.0).
+
+CGMP is an experimental framework. Numerical parameters in the repository
+are modelling inputs and should not be interpreted as regulatory,
+commercial, safety or economic guarantees.
