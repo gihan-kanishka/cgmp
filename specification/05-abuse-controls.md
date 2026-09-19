@@ -14,7 +14,8 @@ Where feasible, the server should validate or calculate:
 - start/end state;
 - vehicle class;
 - long-distance eligibility;
-- bid-round state.
+- fallback-dispatch state;
+- authoritative offer receipt/order.
 
 Client telemetry is evidence, not sole authority.
 
@@ -38,12 +39,29 @@ Users who repeatedly submit unsupported complaints across many drivers can be id
 
 > Reports establish patterns; objective trip data validates them.
 
+## Automated preferences
+
+Passenger and driver standing preferences should be stored and evaluated in a way that is auditable.
+
+Important controls include:
+
+- versioning preference changes;
+- recording which preference version authorized a trip or generated an offer;
+- preventing one side from learning the other side's private threshold;
+- preventing client-side tampering with server-enforced limits.
+
+## First-qualifying dispatch integrity
+
+Because the first qualifying sealed offer clears the trip, the platform's ordering mechanism becomes fare- and allocation-critical.
+
+A production implementation should use an authoritative server-side receipt/order rule, monitor abnormal latency advantages, and retain sufficient event data to audit disputed assignments.
+
 ## Long-distance claims
 
 Long-distance provisions are rule-derived and accepted before the trip; they are not discretionary after-the-fact driver claims.
 
 ## Platform governance
 
-A deployment should publish fare parameters, commission, pickup rules, long-distance rules, bidding rules, and major parameter revisions.
+A deployment should publish fare parameters, commission, pickup rules, long-distance rules, fallback-dispatch rules, and major parameter revisions.
 
 This does not make manipulation impossible, but it makes discretionary changes more visible and auditable.
