@@ -1,6 +1,6 @@
 import unittest
 
-from simulator.cgmp import driver_receipt, lowest_qualifying_bid, ordinary_fare
+from simulator.cgmp import driver_receipt, first_qualifying_bid, ordinary_fare
 
 
 class TestCGMP(unittest.TestCase):
@@ -17,17 +17,23 @@ class TestCGMP(unittest.TestCase):
     def test_commission(self):
         self.assertEqual(driver_receipt(1000), 930.0)
 
-    def test_lowest_qualifying_bid(self):
+    def test_first_qualifying_bid_wins_even_if_later_bid_is_lower(self):
         self.assertEqual(
-            lowest_qualifying_bid(1000, 1300, [1250, 1175, 1400, 1200]),
-            1175.0,
+            first_qualifying_bid(1000, 1300, [1320, 1250, 1175, 1200]),
+            1250.0,
+        )
+
+    def test_bid_below_baseline_does_not_clear(self):
+        self.assertEqual(
+            first_qualifying_bid(1000, 1300, [950, 1100]),
+            1100.0,
         )
 
     def test_no_qualifying_bid(self):
-        self.assertIsNone(lowest_qualifying_bid(1000, 1100, [1150, 1200]))
+        self.assertIsNone(first_qualifying_bid(1000, 1100, [1150, 1200]))
 
     def test_ceiling_below_baseline(self):
-        self.assertIsNone(lowest_qualifying_bid(1000, 900, [900]))
+        self.assertIsNone(first_qualifying_bid(1000, 900, [900]))
 
 
 if __name__ == "__main__":
