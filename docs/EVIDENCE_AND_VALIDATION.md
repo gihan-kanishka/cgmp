@@ -9,9 +9,11 @@ The following can be verified directly from the rules:
 - normal fares are deterministic functions of published inputs;
 - ordinary pricing does not require a supply-demand multiplier;
 - pickup charges can be disclosed before dispatch;
+- passengers can pre-authorize pickup distance/cost limits;
 - long-distance provisions can be agreed before the trip;
-- sealed bids can hide both the passenger ceiling and competing driver bids;
-- the lowest qualifying bid can be selected mechanically.
+- driver fallback offers can remain private;
+- the passenger ceiling can remain private;
+- the first qualifying sealed offer can clear immediately without waiting for an auction window.
 
 ## Claims that require empirical validation
 
@@ -24,7 +26,9 @@ A live pilot is required to determine whether CGMP:
 - reduces speeding or aggressive-driving complaints;
 - creates deliberate slow-driving behaviour;
 - improves long-distance trip completion;
-- supports a sustainable platform at the chosen commission rate.
+- supports a sustainable platform at the chosen commission rate;
+- produces acceptable fairness outcomes under first-qualifying dispatch;
+- avoids material assignment bias from device/network latency.
 
 ## Recommended pilot design
 
@@ -39,15 +43,20 @@ Suggested metrics:
 - acceptance rate;
 - passenger cancellation rate;
 - driver cancellation rate;
-- time to match;
+- time to match at normal baseline;
+- time from fallback activation to assignment;
+- share of trips clearing on the first qualifying fallback offer;
+- distribution of fallback assignments across eligible drivers;
+- relationship between measured network latency and fallback win rate;
 - speeding events per 100 trips;
 - speeding/aggressive-driving complaints per 1,000 trips;
 - unexplained excess journey time;
 - slow-driving complaints per 1,000 trips;
 - pickup acceptance by pickup-distance band;
-- percentage of trips entering sealed bidding;
-- sealed-bid clearing premium relative to baseline;
-- percentage of bidding rounds that fail to clear;
+- percentage of pickups auto-authorized by standing passenger preferences;
+- percentage of trips entering sealed fallback dispatch;
+- fallback clearing premium relative to baseline;
+- percentage of fallback requests that fail to clear;
 - long-distance acceptance and completion rate.
 
 ## Calibration data
@@ -63,7 +72,8 @@ Before production use, collect market-specific data for:
 - pickup-distance distributions;
 - long-distance route characteristics;
 - driver utilization and idle time;
-- platform operating costs.
+- platform operating costs;
+- device/network latency distributions relevant to first-qualifying dispatch.
 
 ## Safety hypothesis
 
