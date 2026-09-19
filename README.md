@@ -49,27 +49,50 @@ These are configurable parameters, not immutable parts of the framework.
 2. **Ordinary fares are cost-grounded, not automatically surge-multiplied by scarcity.**
 3. **Traffic can increase a fare because it consumes more driver time, and the app should explain that cause explicitly.**
 4. **Pickup distance is paid at the vehicle-class distance rate.**
-5. **Pickup above the configured consent threshold requires passenger approval before dispatch.**
+5. **Passengers can pre-authorize pickup distance/cost limits; requests outside those saved limits require explicit approval before dispatch.**
 6. **Exceptional long-distance displacement charges are calculated and shown before the trip is accepted.**
 7. **Efficient vehicles retain their efficiency advantage.** Passenger tariffs are based on service class rather than individual powertrain.
-8. **When the published baseline does not attract a driver, the system uses a sealed-bid fallback rather than an automatic surge multiplier.**
-9. **The passenger's maximum price is private. Driver bids are private. The lowest qualifying bid wins.**
-10. **Fare-critical route, time and distance data should be computed or validated server-side.**
+8. **When the published baseline does not attract a driver, the system uses a sealed fallback rather than an automatic surge multiplier.**
+9. **The passenger's maximum price is private. Driver offers are private. The first valid offer within the passenger's ceiling clears the trip immediately.**
+10. **Drivers can configure automatic private bidding rules while parked, avoiding manual numerical bidding while driving.**
+11. **Fare-critical route, time and distance data should be computed or validated server-side.**
 
-## Market-clearing fallback
+## Fast market-clearing fallback
 
 Normal dispatch happens first at the published baseline.
 
 If no driver accepts:
 
-1. the passenger may set a private maximum total fare;
-2. eligible drivers receive the trip details and submit private bids;
-3. drivers do not see the passenger maximum;
-4. drivers do not see competing bids;
-5. the system chooses the lowest valid bid that does not exceed the passenger maximum;
-6. if no bid qualifies, no match occurs unless the passenger voluntarily changes the ceiling.
+1. the passenger may use a saved private maximum total fare or set one for that request;
+2. eligible driver apps evaluate the request using private, preconfigured bidding rules;
+3. driver rules may consider pickup ETA, pickup distance, trip distance, expected trip duration, road/terrain conditions, destination, time of day and the driver's own minimum acceptable economics;
+4. drivers do not see the passenger maximum;
+5. drivers do not see competing offers;
+6. the first server-valid offer satisfying `baseline <= bid <= passenger maximum` immediately clears the trip;
+7. if no offer qualifies, no match occurs unless the passenger voluntarily changes the ceiling.
 
-This makes scarcity a market-discovered exception rather than a platform-imposed multiplier applied to every trip.
+The objective is **fast market clearing within a passenger-chosen affordability limit**, not waiting for an auction window to find the mathematically lowest offer.
+
+To reduce dispatch bias, an implementation should send a fallback request to the relevant candidate group at effectively the same dispatch epoch and use authoritative server receipt/order rules.
+
+## Automated preferences
+
+### Driver side
+
+Drivers should be able to configure private bidding preferences during signup or while parked. The app can then submit qualifying fallback offers automatically without requiring the driver to type a price while operating the vehicle.
+
+A production implementation should not require manual numerical bidding from a moving driver.
+
+### Passenger side
+
+Passengers should be able to configure standing pickup authorization using variables such as:
+
+- maximum pickup distance;
+- maximum pickup cost.
+
+For example, a passenger may authorize pickup automatically when both the distance and cost are within their saved limits. The app should still disclose the actual pickup distance and charge.
+
+The same principle can be used for a saved private fallback ceiling if the passenger chooses to enable it.
 
 ## Pickup policy
 
@@ -77,10 +100,15 @@ Pickup distance is charged at the normal class Rs/km rate.
 
 In the v1.0-draft policy:
 
-- pickup up to **2 km** may be incorporated automatically into the quoted fare;
-- pickup above **2 km** requires explicit passenger approval before dispatch;
+- a default pickup consent threshold may be configured by the deployment;
+- the reference modelling threshold is **2 km**;
+- passengers may set their own standing auto-approval limits based on pickup distance and/or pickup cost;
+- if the requested pickup falls within those saved limits, separate interaction is unnecessary;
+- if it falls outside the saved limits, explicit passenger approval is required before dispatch;
 - pickup time is not separately charged;
 - route distance should be determined from a reasonable server-calculated route and frozen at dispatch/acceptance according to implementation policy.
+
+Standing preferences are intended to preserve informed consent without adding a confirmation screen to every qualifying request.
 
 ## Long-distance policy
 
@@ -88,7 +116,7 @@ CGMP does not guarantee a driver a profitable round trip.
 
 The baseline should compensate the outbound trip fairly. Where the trip creates unavoidable displacement—such as a destination/time combination that makes an immediate safe return unreasonable—a pre-trip provision may cover necessary accommodation, meals, tolls or other defined displacement costs.
 
-The passenger must see and agree to the rule-derived amount before the trip.
+The passenger must see and agree to the rule-derived amount before the trip, either directly or through an applicable pre-authorized rule.
 
 CGMP does **not** automatically compensate hypothetical future wages or guarantee full empty-return economics.
 
@@ -98,10 +126,10 @@ CGMP aims to reduce discretionary pricing surfaces:
 
 - published rates and parameter history;
 - server-side route/distance/time validation;
-- private sealed bids;
+- private sealed driver offers;
 - hidden passenger ceiling;
-- lowest qualifying bid selection;
-- pre-trip consent for exceptional charges;
+- first-qualifying server-side clearing;
+- pre-authorized or explicit consent for exceptional charges;
 - telemetry-assisted review of repeated route stretching, deliberate crawling or repeated speeding;
 - two-sided review so unsupported chronic complaints can also be detected.
 
