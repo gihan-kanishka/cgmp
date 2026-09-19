@@ -62,23 +62,29 @@ def driver_receipt(
     return round(passenger_fare * (1 - commission_rate), 2)
 
 
-def lowest_qualifying_bid(
+def first_qualifying_bid(
     baseline_fare: float,
     passenger_max: float,
-    bids: Iterable[float],
+    bids_in_authoritative_order: Iterable[float],
 ) -> Optional[float]:
+    """Return the first server-ordered sealed bid within the allowed interval.
+
+    The iterable order represents the platform's authoritative receipt/order
+    mechanism. CGMP v1.0-draft clears immediately on the first bid satisfying:
+
+        baseline_fare <= bid <= passenger_max
+    """
     if baseline_fare < 0 or passenger_max < 0:
         raise ValueError("fares cannot be negative")
     if passenger_max < baseline_fare:
         return None
 
-    eligible = [
-        float(b) for b in bids
-        if b >= baseline_fare and b <= passenger_max
-    ]
-    if not eligible:
-        return None
-    return round(min(eligible), 2)
+    for bid in bids_in_authoritative_order:
+        bid = float(bid)
+        if baseline_fare <= bid <= passenger_max:
+            return round(bid, 2)
+
+    return None
 
 
 if __name__ == "__main__":
@@ -90,3 +96,10 @@ if __name__ == "__main__":
     )
     print(f"Example tuk fare: LKR {example:.2f}")
     print(f"Driver receipt at 7% commission: LKR {driver_receipt(example):.2f}")
+
+    clearing_bid = first_qualifying_bid(
+        baseline_fare=1000,
+        passenger_max=1300,
+        bids_in_authoritative_order=[1320, 1250, 1175],
+    )
+    print(f"First qualifying fallback bid: LKR {clearing_bid:.2f}")
