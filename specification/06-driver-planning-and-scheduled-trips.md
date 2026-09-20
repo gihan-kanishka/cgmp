@@ -66,19 +66,21 @@ High-profit long-distance scheduled trips should be distributed as fairly as pra
 
 A production deployment must publish an objective rule defining a **qualifying high-value long-distance scheduled trip**. The definition may use trip distance, expected duration, fare value or another auditable threshold. v1.2 does not invent that threshold before deployment evidence exists.
 
-The reference fairness rule uses a **7-day lookback**:
+The fairness lookback is a **configurable, published deployment parameter**. The v1.2 reference default is **7 days**, but a deployment may shorten or lengthen it using observed allocation concentration, trip frequency and availability evidence.
 
-- a driver who completed a qualifying high-value long-distance trip during the previous 7 days is temporarily deprioritized for another qualifying trip;
-- drivers who have not completed such a trip during the previous 7 days are considered first;
+Let `L_fair` be the configured fairness lookback in days. Then:
+
+- a driver who completed a qualifying high-value long-distance trip during the previous `L_fair` days is temporarily deprioritized for another qualifying trip;
+- drivers who have not completed such a trip during the previous `L_fair` days are considered first;
 - among otherwise equivalent drivers in the same access pool, the driver least recently served by a qualifying trip receives earlier opportunity;
 - if no non-recent driver is available or accepts, the restriction is relaxed and recently served drivers may receive the trip.
 
 For qualifying high-value long-distance scheduled trips, fairness takes precedence over premium status once the relevant candidate pool is considered. The intended sequence is:
 
 ```text
-premium drivers with no qualifying trip in previous 7 days
+premium drivers with no qualifying trip in previous L_fair days
     ->
-regular drivers with no qualifying trip in previous 7 days
+regular drivers with no qualifying trip in previous L_fair days
     ->
 recently served eligible drivers
 ```
@@ -124,8 +126,10 @@ The following must be published and versioned before production use:
 - premium subscription benefits;
 - premium-priority window policy;
 - qualifying long-distance/high-value threshold;
-- 7-day fairness lookback;
+- configurable fairness lookback `L_fair` and its current effective value;
 - fairness ordering and availability override;
 - forecast methodology at a level sufficient for audit without exposing security-sensitive implementation details.
+
+Changes to `L_fair` should be versioned and should not be made silently or per-driver.
 
 No additional premium benefit should be implied unless it is separately specified.
