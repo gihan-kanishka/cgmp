@@ -64,6 +64,8 @@ Allow Zenodo to assign a DOI at publication. If a DOI is reserved in advance, it
 
 ## Notes
 
+- The preprint includes **Appendix A: Frequently Raised Design Questions**, which explains recurring design objections without adding new fare or dispatch rules.
+
 - Design preprint; focused strategic simulation and live controlled-pilot validation pending.
 - Aggregate ICE cost inputs are provisional until dated component calibration is completed.
 - Preprint/documentation license: CC BY 4.0.
