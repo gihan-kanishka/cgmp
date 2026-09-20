@@ -1,28 +1,41 @@
-# CGMP v1.0 Preprint
+# CGMP Preprints
 
-This directory contains the publication-oriented CGMP v1.0 design preprint.
+This directory contains publication-oriented CGMP design preprints.
+
+## Current version
+
+**CGMP v1.1-preprint** is the current working publication version.
+
+Primary source:
+
+- `CGMP-v1.1-preprint.md`
+
+Historical source:
+
+- `CGMP-v1.0-preprint.md`
+
+Zenodo submission metadata is maintained in:
+
+- `ZENODO_SUBMISSION.md`
 
 ## Status
 
-CGMP is currently a **design and simulation framework**. It has not yet been validated by a live controlled pilot.
+CGMP remains a design and simulation framework. It has not yet been validated by a live controlled pilot.
 
-The preprint is intended to make the architecture citable and reviewable while keeping empirical claims appropriately limited.
+v1.1 materially revises fare calibration and dispatch sequencing:
 
-## Primary files
-
-- `CGMP-v1.0-preprint.md` - repository-readable preprint source.
-- `ZENODO_SUBMISSION.md` - exact metadata and upload guidance for a Zenodo publication record.
-
-A formatted PDF/DOCX version of the preprint is generated separately from the same design material.
+- representative ICE economics set the tariff benchmark;
+- passenger time rate is Rs 12.90/min;
+- minimum trip and initial pickup allowance are both 2 km;
+- search expands in 2 km increments;
+- expanded search remains deterministic;
+- sealed bidding is enabled only after authorized deterministic expanded search fails;
+- class-specific vehicle headroom may be competitively tuned without crossing the economic floor.
 
 ## Recommended publication path
 
-1. Publish the preprint as a Zenodo **Publication / Preprint** record under **CC BY 4.0**.
-2. Keep the reference implementation in this repository under **Apache-2.0**.
-3. Optionally enable the repository in Zenodo's GitHub integration and archive software releases separately.
-4. Use the Zenodo DOI in later citations and future versions.
-5. Submit a strengthened version to a transportation/economics conference or journal after simulation and pilot evidence is available.
-
-## Citation status
-
-Until a Zenodo DOI is assigned, cite the repository and the version/date shown in the preprint.
+1. Run strategic simulation using the v1.1 reference implementation.
+2. Publish the v1.1 design preprint on Zenodo under CC BY 4.0 when ready.
+3. Keep reference software under Apache-2.0.
+4. Use the Zenodo DOI in later citations and versions.
+5. Follow with controlled operator pilot evidence before making superiority or safety claims.
