@@ -32,9 +32,16 @@ The cause of the increase is therefore measurable trip time rather than a hidden
 
 ## 5. If CGMP is cost-grounded, why can vehicle headroom change with competitor fares?
 
-Representative ICE operating economics and the labour target define the economic floor. Class-specific vehicle headroom is the competitive margin above that floor.
+For the vehicle-distance component, the v1.2 floor is defined separately from headroom:
 
-Competitive calibration is therefore allowed, but only through scheduled, versioned review using standardized ordinary/non-scarcity competitor fares. It must not become a real-time demand-sensitive price control and must not push the tariff below the economic floor.
+```text
+R_floor_c = C_c / (1 - gamma)
+R_c       = roundUp_0.50((C_c + H_c) / (1 - gamma))
+```
+
+`C_c` is representative ICE routine economic cost/km, `H_c >= 0` is competitive headroom, and `gamma` is the commission rate.
+
+Headroom is therefore **not part of the economic floor**. Competitive calibration may change `H_c`, but only through scheduled, versioned review using standardized ordinary/non-scarcity competitor fares. It must not become a real-time demand-sensitive price control or make the published rate fall below the floor.
 
 ## 6. Why are EV operating costs not used to lower the class tariff?
 
@@ -79,3 +86,12 @@ v1.2 therefore follows a deliberate anti-over-engineering principle:
 > Measure uncertain behavioral problems before adding new pricing or dispatch rules.
 
 Premium caps, rejecter bans, auction waiting windows, pickup-time fractions and latency handicaps remain possible experimental controls, but they are not part of the reference mechanism unless simulation or pilot evidence demonstrates a material need.
+
+
+## 12. Why is there no platform-selected default fallback ceiling?
+
+A platform-selected default such as "+20%" could become an anchor for both passengers and driver bidding strategies.
+
+v1.2 therefore provides **no default premium or default ceiling**. A passenger who wants Stage 3 must explicitly choose a private ceiling rule for that request or save one in advance. If no rule exists, fallback is not activated.
+
+This keeps the affordability decision with the passenger rather than allowing the platform to normalize a particular scarcity premium.
