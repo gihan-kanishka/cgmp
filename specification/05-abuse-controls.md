@@ -1,67 +1,92 @@
-# Abuse and Integrity Controls
+# Abuse and Integrity Controls - v1.1
 
-CGMP reduces discretionary pricing but remains vulnerable to falsified inputs and strategic behaviour. Fare integrity should therefore be treated as a server-side systems problem.
+CGMP is designed to be manipulation-resistant, not manipulation-proof.
 
 ## Fare-critical data
 
 Where feasible, the server should validate or calculate:
 
 - legal/reasonable route geometry;
-- pickup distance;
+- pickup distance and search band;
 - passenger-trip distance;
-- timestamps;
+- passenger-trip timestamps;
 - vehicle movement plausibility;
-- start/end state;
 - vehicle class;
 - long-distance eligibility;
-- fallback-dispatch state;
-- authoritative offer receipt/order.
+- passenger authorization state;
+- deterministic-search state;
+- fallback activation state;
+- authoritative fallback offer receipt/order.
 
 Client telemetry is evidence, not sole authority.
 
-## Deliberate trip stretching
+## Time manipulation
 
-A single slow or unusual trip is not sufficient evidence of abuse.
+The current fare explicitly compensates legitimate passenger-trip time.
 
-The system should look for repeated patterns such as materially longer journey times than comparable trips, unnecessary detours, repeated passenger complaints supported by telemetry, and unexplained divergence from reasonable routes.
+A single slow trip is not evidence of abuse. Review should focus on repeated patterns such as:
 
-## Speed manipulation
+- materially longer times than comparable trips;
+- unnecessary detours;
+- repeated supported passenger reports;
+- unexplained divergence from reasonable route/time distributions.
 
-The same framework should identify both repeated deliberate crawling intended to inflate time charges and repeated speeding/aggressive driving.
-
-The pricing objective is not to reward either behaviour.
+The same system should detect repeated speeding/aggressive-driving patterns.
 
 ## Passenger complaint integrity
 
-Passenger reports should contribute to review, not automatically determine guilt.
+Passenger reports should trigger review rather than automatic guilt.
 
-Users who repeatedly submit unsupported complaints across many drivers can be identified and their reports routed for additional verification.
+Chronic unsupported complaint patterns may themselves be flagged for verification.
 
 > Reports establish patterns; objective trip data validates them.
 
-## Automated preferences
+## Search and pickup integrity
 
-Passenger and driver standing preferences should be stored and evaluated in a way that is auditable.
+The platform should log:
 
-Important controls include:
+- initial 0-2 km search;
+- each 2 km expansion authorization;
+- actual pickup distance;
+- charged pickup distance;
+- whether the authorization was interactive or a saved preference.
 
-- versioning preference changes;
-- recording which preference version authorized a trip or generated an offer;
-- preventing one side from learning the other side's private threshold;
-- preventing client-side tampering with server-enforced limits.
+Search-band boundaries must never be used as billing distance when actual pickup is lower.
 
-## First-qualifying dispatch integrity
+## Strategic rejection and fallback
 
-Because the first qualifying sealed offer clears the trip, the platform's ordering mechanism becomes fare- and allocation-critical.
+Monitor:
 
-A production implementation should use an authoritative server-side receipt/order rule, monitor abnormal latency advantages, and retain sufficient event data to audit disputed assignments.
+- deterministic-offer rejection rates;
+- fallback activation rate;
+- repeated rejection immediately followed by fallback participation;
+- synchronized rejection/offer behavior;
+- unusual account/device relationships;
+- regional/time-of-day clusters.
+
+The existence of competitive alternatives and viable deterministic fares may limit gaming, but this should be measured rather than assumed.
+
+If material reject-and-wait behavior appears, the implementation may lock a rejecting driver out of premium bidding on the same request.
+
+## First-qualifying integrity
+
+Because the first qualifying sealed offer clears the trip, authoritative ordering is allocation-critical.
+
+The platform should:
+
+- use server-authoritative receipt/order;
+- monitor abnormal latency advantages;
+- retain sufficient event data for audit;
+- publish or document the ordering policy.
+
+## Calibration integrity
+
+Competitive tuning may adjust only declared competitive variables.
+
+It must not silently push the fare below the economic floor or alter the labour target, commission, minimum-distance rule or scarcity mechanism.
+
+Parameter changes should be versioned and auditable.
 
 ## Long-distance claims
 
-Long-distance provisions are rule-derived and accepted before the trip; they are not discretionary after-the-fact driver claims.
-
-## Platform governance
-
-A deployment should publish fare parameters, commission, pickup rules, long-distance rules, fallback-dispatch rules, and major parameter revisions.
-
-This does not make manipulation impossible, but it makes discretionary changes more visible and auditable.
+Long-distance provisions are rule-derived and accepted before the trip. They are not discretionary after-the-fact driver claims.
