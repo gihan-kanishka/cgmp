@@ -1,201 +1,36 @@
-# CGMP Core Fare Specification - v1.2
+# Core Fare - v1.4
 
-## 1. Objective
-
-CGMP v1.2 deliberately keeps the fare mechanism small.
-
-The core rule is:
-
-> Distance pays for vehicle use; passenger-trip time pays for the human.
-
-Potential behavioral problems are monitored before extra tariff rules are added.
-
-## 2. Fare equation
-
-Let:
-
-- `d_t` = passenger-trip distance;
-- `d_p` = actual authorized pickup distance;
-- `D_min` = minimum passenger-trip distance;
-- `P_min` = included pickup distance;
-- `r_c` = passenger-facing distance rate for class `c`;
-- `t` = verified passenger-trip minutes;
-- `r_t` = passenger-facing time rate;
-- `L` = pre-agreed long-distance provision.
-
-Reference fare:
+## Ordinary meter
 
 ```text
-F =
-  [max(d_t, D_min) + max(d_p, P_min)] * r_c
-  + t * r_t
-  + L
+F_meter = [max(d_t, 2) + max(d_p, 2)] * r_c + t_b * 12.90
 ```
 
-Current reference values:
+`d_t` is passenger-trip distance, `d_p` is authorized pickup distance, and `t_b` is verified billable passenger-trip time after driver-personal-stop pauses.
 
-```text
-D_min = 2 km
-P_min = 2 km
-r_t = Rs 12.90/min
-commission = 7%
-```
+Published class rates:
 
-Pickup time is not billable.
+- Bike: Rs 22/km
+- Tuk: Rs 37/km
+- Mini: Rs 52/km
+- Compact: Rs 57/km
+- Sedan: Rs 65/km
 
-## 3. Current passenger distance rates
+Platform commission is 7% of passenger-paid CGMP components.
 
-| Class | Passenger distance rate |
-|---|---:|
-| Bike | Rs 15.00/km |
-| Tuk | Rs 37.00/km |
-| Mini | Rs 51.50/km |
-| Compact | Rs 53.00/km |
-| Sedan | Rs 61.50/km |
-
-## 4. ICE cost basis
-
-Current provisional routine ICE cost assumptions:
-
-| Class | Routine ICE cost/km |
-|---|---:|
-| Bike | Rs 10.50 |
-| Tuk | Rs 22.10 |
-| Mini | Rs 32.80 |
-| Compact | Rs 34.00 |
-| Sedan | Rs 36.10 |
-
-A production calibration must publish the dated underlying inputs used to derive these aggregates.
-
-### 4.1 Provisional Bike recalibration
-
-The Bike class is benchmarked to an economical commuter motorcycle rather than a larger motorcycle or scooter.
-
-For the v1.2 working calibration:
-
-```text
-Petrol 92 reference price = Rs 399/litre
-conservative working fuel economy = 60 km/litre
-fuel cost = 399 / 60 = Rs 6.65/km
-pooled non-fuel routine-wear reserve = Rs 3.85/km
-provisional Bike routine cost = Rs 10.50/km
-```
-
-The 60 km/l assumption is deliberately below manufacturer-reported 75-80 km/l figures for economical 100 cc commuter motorcycles, allowing for pillion load, stop-start operation and real-world ride-hailing use.
-
-The Rs 3.85/km non-fuel reserve is still a provisional aggregate covering tyres, scheduled service, chain/sprockets, brakes, suspension/repairs and other routine wear. It must be replaced by a dated fleet-derived component table before production.
-
-The intended component structure is:
-
-```text
-routine ICE cost/km =
-    fuel cost/km
-  + tyres/km
-  + scheduled service/km
-  + brakes/suspension/repairs/km
-  + other defined routine wear/km
-```
-
-CGMP v1.2 does not invent a component breakdown where empirical data has not yet been collected.
-
-EV and unusually efficient vehicle economics do not set passenger tariffs.
-
-## 5. Competitive headroom
-
-Current target net vehicle headroom after commission:
-
-| Class | Target net headroom/km |
-|---|---:|
-| Bike | Rs 3 |
-| Tuk | Rs 12 |
-| Mini | Rs 15 |
-| Compact | Rs 15 |
-| Sedan | Rs 21 |
-
-Let:
-
-- `C_c` = representative ICE routine economic cost/km for class `c`;
-- `H_c` = non-negative competitive headroom/km;
-- `gamma` = platform commission rate.
-
-The **vehicle-distance economic floor** is:
+## Economic floor and headroom
 
 ```text
 R_floor_c = C_c / (1 - gamma)
+H_c = R_c * (1 - gamma) - C_c
 ```
 
-The published passenger distance rate is:
+Representative class cost sets the floor. Published headroom is a scheduled competitive/class-risk margin above the floor.
 
-```text
-R_c = roundUp_0.50(
-        (C_c + H_c) / (1 - gamma)
-      )
-```
+## Efficiency
 
-where `roundUp_0.50` means round upward to the next **Rs 0.50/km** billing increment.
+The tariff is class-based. Individual fuel, maintenance, hybrid or EV efficiency savings remain with the driver.
 
-Therefore, **headroom is not part of the economic floor**. It is the competitive margin above the floor.
+## No surge and no driver bidding
 
-Headroom may be recalibrated against competitor fares, but only through a scheduled periodic review using standardized ordinary/non-scarcity observations.
-
-It must not be adjusted continuously with demand, must remain non-negative, and must not push the published rate below `R_floor_c`.
-
-## 6. Labour rate
-
-Current target net driver labour compensation during the passenger trip is **Rs 12/minute**.
-
-```text
-12 / 0.93 ~= Rs 12.90/min passenger-facing
-```
-
-This is a **paid passenger-trip labour rate**, not a claim that a driver earns Rs 720 for every hour logged into the platform.
-
-Actual online-hour earnings depend on utilization, pickup time, idle time, acceptance and market conditions and must be measured separately.
-
-## 7. Verified passenger-trip time
-
-Billable time:
-
-- begins at the server-recorded passenger-trip start;
-- ends at the server-recorded trip end;
-- excludes pickup time;
-- is checked against route/GPS/trip-state data;
-- is flagged for review when implausible or disputed.
-
-The reference implementation treats the upfront price as an estimate and the final fare as a metered fare using verified passenger-trip time.
-
-A fixed-price implementation is a documented variant, not the v1.2 reference rule.
-
-## 8. Congestion versus scarcity
-
-Congestion may increase the fare because it increases paid passenger-trip time.
-
-CGMP therefore does **not** claim that fares never increase with traffic conditions.
-
-The narrower claim is:
-
-> The ordinary tariff does not apply an automatic supply-demand scarcity multiplier.
-
-## 9. Gross fare, commission and pass-through costs
-
-Published rates and fallback offers are **gross passenger-facing amounts**.
-
-The 7% commission applies to commissionable fare components, including:
-
-- distance;
-- passenger-trip time;
-- fallback premium.
-
-A direct third-party/pass-through expense may be marked commission-exempt when it is separately identified before acceptance, for example an actual toll or explicitly reimbursed accommodation expense.
-
-## 10. Parameter governance
-
-A production implementation should publish:
-
-- current parameters;
-- effective dates;
-- cost-input methodology;
-- competitive-review methodology;
-- parameter-change history.
-
-The mechanism should remain simple enough that a passenger, driver or auditor can reproduce the fare from the published inputs.
+The v1.4 reference core has no automatic demand/supply surge multiplier and no discretionary driver-bidding premium.
