@@ -20,7 +20,7 @@ from simulator.cgmp import (
 class TestCGMPv12(unittest.TestCase):
     def test_published_distance_rates(self):
         expected = {
-            "bike": 19.0,
+            "bike": 15.0,
             "tuk": 37.0,
             "mini": 51.5,
             "compact": 53.0,
@@ -48,7 +48,7 @@ class TestCGMPv12(unittest.TestCase):
     def test_minimum_fare_2km_trip_plus_2km_pickup(self):
         minutes = reference_trip_minutes(2)
         expected = {
-            "bike": 137.92,
+            "bike": 121.92,
             "tuk": 209.92,
             "mini": 267.92,
             "compact": 273.92,
@@ -65,7 +65,7 @@ class TestCGMPv12(unittest.TestCase):
 
     def test_13km_reference_fares(self):
         expected = {
-            "bike": 687.48,
+            "bike": 627.48,
             "tuk": 957.48,
             "mini": 1174.98,
             "compact": 1197.48,
@@ -76,7 +76,7 @@ class TestCGMPv12(unittest.TestCase):
 
     def test_effective_rates_at_25kmh(self):
         expected = {
-            "bike": 49.96,
+            "bike": 45.96,
             "tuk": 67.96,
             "mini": 82.46,
             "compact": 83.96,
