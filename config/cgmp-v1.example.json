@@ -1,7 +1,18 @@
 {
-  "version": "1.1-preprint",
+  "version": "1.2-preprint",
   "currency": "LKR",
-  "platform_commission_rate": 0.07,
+  "platform_commission": {
+    "rate": 0.07,
+    "commissionable_components": [
+      "distance_charge",
+      "passenger_trip_time_charge",
+      "fallback_premium"
+    ],
+    "commission_exempt_pass_throughs": [
+      "actual_tolls",
+      "explicitly_reimbursed_accommodation_or_similar_third_party_costs"
+    ]
+  },
   "calibration": {
     "tariff_basis": "representative_ICE_class_economics",
     "ignore_EV_costs_for_tariff_setting": true,
@@ -9,6 +20,14 @@
     "target_net_driver_labour_per_min": 12.0,
     "passenger_time_rate_per_min": 12.9,
     "reference_speed_kmph_for_examples": 25.0,
+    "routine_ICE_cost_formula_components": [
+      "fuel_cost_per_km",
+      "tyres_per_km",
+      "scheduled_service_per_km",
+      "brakes_suspension_repairs_per_km",
+      "other_defined_routine_wear_per_km"
+    ],
+    "component_breakdown_status": "required_before_production; current aggregate class costs are provisional modelling assumptions",
     "classes": {
       "bike": {
         "routine_ICE_cost_per_km": 14.5,
@@ -38,6 +57,9 @@
     },
     "competitive_tuning": {
       "enabled": true,
+      "mode": "scheduled_periodic_review",
+      "real_time_adjustment": false,
+      "exclude_competitor_scarcity_or_surge_prices": true,
       "tunable_field": "target_net_vehicle_headroom_per_km",
       "hard_floor_must_be_preserved": true,
       "benchmark_trip_distances_km": [2, 5, 10, 13, 20]
@@ -51,6 +73,7 @@
     "initial_radius_km": 2.0,
     "expansion_increment_km": 2.0,
     "charge_pickup_time": false,
+    "pickup_time_policy_reason": "passenger already bears pre-trip waiting; pickup vehicle movement is compensated through distance",
     "bill_actual_authorized_pickup_distance": true,
     "passenger_standing_authorization": {
       "enabled": true,
@@ -59,13 +82,24 @@
       "max_auto_search_radius_km": null
     }
   },
+  "trip_time": {
+    "billable_interval": "passenger_trip_start_to_passenger_trip_end",
+    "pickup_time_excluded": true,
+    "server_validation_required": true,
+    "upfront_display": "estimate",
+    "reference_final_fare_basis": "verified_actual_passenger_trip_time",
+    "implausible_or_disputed_intervals": "flag_for_review"
+  },
   "sealed_bidding": {
     "enabled": true,
     "activation_rule": "only_after_authorized_deterministic_expanded_search_fails",
+    "baseline_definition": "driver_specific_gross_passenger_fare_F0_i",
+    "passenger_ceiling_definition": "private_rule_applied_to_F0_i_to_produce_M_i",
+    "bid_definition": "gross_passenger_facing_total_fare_b_i",
     "passenger_max_hidden": true,
     "driver_bids_hidden": true,
     "selection_rule": "first_qualifying_bid",
-    "qualifying_rule": "baseline_fare <= bid <= passenger_max",
+    "qualifying_rule": "F0_i <= b_i <= M_i",
     "clear_immediately": true,
     "authoritative_order": "server_receipt_order",
     "passenger_ceiling_modes": [
@@ -73,19 +107,11 @@
       "fixed_amount_per_trip_km_above_base",
       "fixed_fee_by_trip_distance_band"
     ],
+    "preemptive_rejecter_ban": false,
+    "preemptive_premium_cap": false,
     "driver_auto_bid": {
       "enabled": true,
-      "manual_numeric_bidding_while_moving": false,
-      "inputs": [
-        "pickup_eta_minutes",
-        "pickup_distance_km",
-        "trip_distance_km",
-        "trip_duration_minutes",
-        "road_condition",
-        "destination",
-        "time_of_day",
-        "minimum_acceptable_economics"
-      ]
+      "manual_numeric_bidding_while_moving": false
     }
   },
   "long_distance": {
@@ -93,5 +119,23 @@
     "requires_pretrip_passenger_consent": true,
     "automatic_lost_wage_compensation": false,
     "automatic_full_empty_return_compensation": false
+  },
+  "monitoring": {
+    "measure_before_adding_corrective_rules": true,
+    "metrics": [
+      "deterministic_acceptance_and_rejection",
+      "acceptance_by_pickup_distance_band",
+      "total_request_to_match_time",
+      "passenger_abandonment_by_stage",
+      "fallback_activation_rate",
+      "fallback_premium_distribution",
+      "clearing_offer_proximity_to_passenger_ceiling",
+      "reject_then_fallback_participation",
+      "network_latency_vs_fallback_win_rate",
+      "driver_net_earnings_and_utilization",
+      "platform_sustainability_at_7_percent",
+      "speeding_or_aggressive_driving_indicators",
+      "unexplained_excess_journey_time"
+    ]
   }
 }
