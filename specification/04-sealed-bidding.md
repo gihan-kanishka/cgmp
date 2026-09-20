@@ -1,138 +1,84 @@
-# Exceptional First-Qualifying Sealed Dispatch - v1.1
+# Exceptional First-Qualifying Sealed Dispatch - v1.2
 
 ## Purpose
 
-The sealed mechanism is a **last-resort exceptional dispatch path**.
+Sealed dispatch is a last-resort recovery mechanism.
 
-It is not activated merely because:
-
-- demand is high;
-- no vehicle exists inside the first 2 km;
-- the search radius expands;
-- a farther pickup costs more.
-
-Those cases remain deterministic CGMP pricing.
+It is not part of ordinary pricing and is not activated merely because the initial 2 km search fails.
 
 ## Preconditions
 
-Sealed bidding is eligible only when all of the following are true:
+Fallback is eligible only after:
 
-1. normal deterministic search has failed;
-2. the passenger has authorized one or more expanded-search stages, either interactively or through standing preferences;
-3. the authorized deterministic expanded-search process has failed to obtain a vehicle;
-4. the passenger has defined a private fallback affordability ceiling.
+1. the initial deterministic search fails;
+2. the passenger authorizes expanded deterministic search;
+3. the authorized deterministic expansions fail;
+4. the passenger has a private fallback affordability rule.
 
-This distinction is central to CGMP.
+## Driver-specific baseline
 
-## Passenger ceiling
+Pickup distance differs by driver, so the deterministic baseline may also differ by driver.
 
-The passenger, not the platform, defines the private maximum fallback allowance.
+For candidate driver `i`:
 
-Supported forms may include:
+- `F0_i` = gross passenger-facing deterministic fare using that candidate's actual authorized pickup distance and any pre-agreed provision;
+- `M_i` = private passenger maximum produced by applying the passenger's chosen ceiling rule to `F0_i`;
+- `b_i` = gross passenger-facing fallback offer from candidate `i`.
 
-1. **percentage above deterministic base**
-   ```text
-   M = F0 * (1 + p)
-   ```
-2. **fixed amount per passenger-trip km above base**
-   ```text
-   M = F0 + a * passenger_trip_km
-   ```
-3. **fixed additional fee by trip-distance band**
-   ```text
-   M = F0 + passenger_selected_band_fee
-   ```
+This makes the passenger's **rule** common while allowing the rupee value of the ceiling to reflect legitimate pickup differences.
 
-The platform should not reveal `M` to drivers.
+## Passenger ceiling modes
 
-## Driver-side automation
+The reference implementation supports:
 
-Drivers configure private fallback rules during signup or while parked.
+- percentage above base;
+- fixed additional amount per passenger-trip km;
+- fixed additional fee by trip-distance band.
 
-Rules may consider:
+The passenger ceiling is private.
 
-- pickup ETA and distance;
-- passenger-trip distance;
-- expected trip duration;
-- road/terrain conditions;
-- destination;
-- time of day;
-- private minimum acceptable economics.
+## Driver offers
 
-A production implementation should not require numerical bidding while the driver is moving.
+Driver offers are private and may be generated automatically from preferences configured while parked.
 
-## Privacy
-
-During fallback:
-
-- passenger ceiling is hidden from drivers;
-- driver offers are hidden from other drivers;
-- no live clearing price is revealed;
-- competing driver offers are not exposed.
+A moving driver should not be required to type a numerical bid.
 
 ## Selection rule
 
-Let:
-
-- `F0` = deterministic CGMP base fare including authorized pickup and any rule-derived long-distance provision;
-- `M` = passenger's private maximum fare;
-- `b_i` = a server-valid private driver offer in authoritative receipt order.
-
-A bid qualifies when:
+An offer qualifies when:
 
 ```text
-F0 <= b_i <= M
+F0_i <= b_i <= M_i
 ```
 
-The first qualifying offer clears immediately:
+The first server-valid qualifying offer in authoritative order clears immediately.
 
-```text
-for each valid offer b_i in authoritative receipt order:
-    if F0 <= b_i <= M:
-        assign trip immediately
-        charge b_i
-        stop
-```
+The passenger pays `b_i`, not automatically `M_i`.
 
-The passenger pays the clearing offer, not automatically `M`.
+The offer is a **gross passenger-facing fare**. The platform commission is taken from commissionable fare after clearing.
 
-## Why first-qualifying is retained
+## v1.2 simplicity rule
 
-CGMP deliberately prioritizes dispatch speed only **after deterministic nearby and expanded searches have already failed**.
+The reference core does **not** preemptively add:
 
-The mechanism therefore solves a recovery problem, not ordinary price discovery.
+- a rejecter ban;
+- a premium cap;
+- a lowest-bid waiting window;
+- a network-latency handicap;
+- adaptive bidding restrictions.
 
-A later lower offer does not replace an already cleared assignment. The tradeoff should be measured empirically against latency, price and fairness outcomes.
+Those are possible future controls only if simulation or pilot evidence demonstrates a material problem.
 
-## Dispatch fairness
+## Monitoring
 
-Because timing determines the winner, the implementation should:
+The system should measure:
 
-1. deliver fallback opportunities to the relevant candidate group at effectively the same dispatch epoch where practical;
-2. use an authoritative server-side receipt/order mechanism;
-3. retain auditable event logs;
-4. measure whether network/device latency systematically affects win rates.
+- fallback activation rate;
+- fallback premium distribution;
+- clearing-offer distance from the passenger ceiling;
+- reject-then-fallback participation;
+- total request-to-fallback time;
+- passenger abandonment by stage;
+- device/network latency versus fallback win rate.
 
-## Strategic rejection
-
-A driver might theoretically reject deterministic work in hope of a later premium. CGMP does not assume this risk is zero.
-
-The design relies on several counterforces:
-
-- the deterministic fare is intended to provide viable economics;
-- the same trip may be taken by another driver;
-- the passenger may switch platforms or cancel;
-- fallback is reached only after authorized expansion fails.
-
-A production pilot should measure rejection patterns and fallback activation rather than assuming either benign or strategic behavior.
-
-A deployment may additionally prevent a driver who rejected a specific deterministic request from later bidding on that same request if evidence shows reject-and-wait gaming is material.
-
-## Health metric
-
-```text
-fallback activation rate =
-  trips entering sealed fallback / all ride requests
-```
-
-CGMP intends this rate to remain low. A high or rising rate is a signal to investigate baseline calibration, supply, search policy or strategic behavior.
+A high fallback rate or persistent premium drift is a diagnostic signal, not a reason to silently convert fallback into normal pricing.
