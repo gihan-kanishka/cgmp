@@ -20,6 +20,17 @@ Collect and publish dated evidence for:
 
 Current aggregate ICE cost/km figures remain provisional until this breakdown exists.
 
+## Bike calibration validation
+
+The current Bike reference uses a provisional **Rs 10.50/km** routine cost based on:
+
+- Petrol 92: Rs 399/litre;
+- conservative loaded-urban working efficiency: 60 km/litre;
+- resulting fuel cost: Rs 6.65/km;
+- pooled non-fuel routine-wear reserve: Rs 3.85/km.
+
+The non-fuel reserve must be validated against dated high-mileage commuter-bike evidence for tyres, servicing/oil, chain and sprockets, brakes, suspension/repairs and other routine wear. The 60 km/l working assumption should also be checked against actual ride-hailing telemetry rather than manufacturer mileage alone.
+
 ## Competitor calibration
 
 Use standardized comparable **ordinary/non-scarcity** fares.
