@@ -1,139 +1,34 @@
-# CGMP v1.2 - Frequently Raised Design Questions
+# CGMP v1.4 - Frequently Raised Design Questions
 
-This document records recurring design questions about the CGMP v1.2 reference architecture. It is explanatory material, not a separate layer of pricing rules.
+## Why is pickup time not billed?
+Pickup distance compensates vehicle deployment while the passenger already bears waiting time. Acceptance is still measured against pickup minutes because slow distant pickups may be unattractive.
 
-## 1. Why is pickup time not compensated separately?
+## Why retain a 2 km pickup minimum?
+It provides a minimum deployment payment and forms the minimum-service structure together with the 2 km passenger component. It remains a pilot-calibration parameter.
 
-Pickup distance is paid at the vehicle-class distance rate, but pickup time is intentionally not billed. Before the ride starts, the passenger already bears the service cost of waiting for the vehicle. CGMP therefore does not add another monetary charge for those pre-trip minutes.
+## Why no driver bidding or surge?
+CGMP keeps ordinary pricing deterministic. If authorized search fails, the request may remain unmatched rather than automatically converting scarcity into a higher passenger price.
 
-This does not assume pickup time has no value to the driver. Acceptance by pickup-distance band, total matching time, passenger abandonment and fallback activation are measured so the policy can be revisited if evidence shows a material problem.
+## Why can traffic still raise the fare?
+Legitimate passenger-trip time is paid at Rs 12.90/minute. No surge means no automatic demand/supply scarcity multiplier, not free driver time.
 
-## 2. Why use first-qualifying fallback instead of waiting for the cheapest bid?
+## Why do efficiency gains remain with the driver?
+The class tariff is based on representative class economics. A more efficient vehicle retains its lower-cost advantage.
 
-Stage 3 is not the normal price-discovery mechanism. It is reached only after the initial deterministic search and passenger-authorized deterministic expansion have failed.
+## What happens if the passenger cancels during pickup?
+After the published grace rule, validated pickup compensation already earned can be debited from the passenger and credited to the driver. No passenger-trip distance or time is charged if the passenger trip never begins.
 
-At that point the objective is rapid market clearing within a passenger-defined private affordability limit. Waiting for a bidding window could produce a lower price, but would deliberately add delay to an already difficult request. v1.2 therefore keeps first-qualifying clearing and measures its price and latency consequences.
+## What happens during a driver personal stop?
+The driver must pause time billing. Both apps display the pause and resume state. Legitimate traffic remains billable; personal time does not.
 
-## 3. Could drivers reject ordinary trips in the hope of reaching a premium fallback?
+## Why does long-distance treatment begin after 40 km?
+The first 40 passenger kilometres remain ordinary service. Beyond 40 km, displacement compensation begins progressively so there is no retrospective threshold jump.
 
-Yes, that behavior is theoretically possible.
+## Why reconcile the long-distance amount at trip end?
+The live amount is provisional. Final distance and eligibility become authoritative at completion. Only the long-distance component is adjusted; the legitimate ordinary meter is not clawed back.
 
-v1.2 does not assume it will be material and does not preemptively ban rejecters from later fallback participation. Instead, the platform measures deterministic rejection, later participation on the same request, fallback activation and repeated reject-then-premium patterns.
+## Does the passenger pay for an empty return?
+No. Long-distance compensation follows a one-day displacement principle and depends on empirical return/local-work outcomes rather than assuming every driver returns empty.
 
-A same-request exclusion rule can be tested later if evidence shows that gaming is large enough to justify the additional restriction.
-
-## 4. Why does CGMP say it avoids surge pricing when congestion can still increase the fare?
-
-CGMP does not claim that the fare is unaffected by traffic.
-
-The narrower claim is that the ordinary tariff does not automatically apply a supply-demand scarcity multiplier. Congestion can increase the fare because legitimate passenger-trip time is an explicit paid component.
-
-The cause of the increase is therefore measurable trip time rather than a hidden scarcity coefficient.
-
-## 5. If CGMP is cost-grounded, why can vehicle headroom change with competitor fares?
-
-For the vehicle-distance component, the v1.2 floor is defined separately from headroom:
-
-```text
-R_floor_c = C_c / (1 - gamma)
-R_c       = roundUp_0.50((C_c + H_c) / (1 - gamma))
-```
-
-`C_c` is representative ICE routine economic cost/km, `H_c >= 0` is competitive headroom, and `gamma` is the commission rate.
-
-Headroom is therefore **not part of the economic floor**. Competitive calibration may change `H_c`, but only through scheduled, versioned review using standardized ordinary/non-scarcity competitor fares. It must not become a real-time demand-sensitive price control or make the published rate fall below the floor.
-
-## 6. Why are EV operating costs not used to lower the class tariff?
-
-The reference tariff is calibrated from representative ICE class economics.
-
-An EV, hybrid or unusually efficient combustion vehicle can provide the same service at a lower operating cost. CGMP allows the owner to retain that efficiency gain instead of using the lowest-cost drivetrain to reset the passenger rate for the entire class.
-
-## 7. Does Rs 12 per paid minute mean a driver earns Rs 720 per online hour?
-
-No.
-
-Rs 12/minute is the current net labour target during the passenger trip. Actual online-hour earnings also depend on passenger-carrying utilization, pickup time, idle time, acceptance, cancellations and market conditions.
-
-CGMP therefore measures paid-trip earnings and online-hour earnings separately.
-
-## 8. What happens if fallback premiums drift upward over time?
-
-v1.2 measures the fallback premium distribution, the distance between clearing offers and passenger ceilings, fallback activation and repeated driver behavior.
-
-It does not add a premium cap before evidence shows that price drift is material. If persistent drift appears, a cap or alternative clearing rule can be tested as a targeted response.
-
-## 9. Does Stage 3 guarantee that a passenger will get a ride?
-
-No.
-
-Stage 3 provides a final market-clearing opportunity when deterministic dispatch fails. A trip can still remain unmatched if there is no willing driver or if all driver offers exceed the passenger's private limit.
-
-The mechanism improves the set of possible matches; it cannot create vehicle supply that does not exist.
-
-## 10. Can a platform operate sustainably at a 7% commission?
-
-The 7% rate is a current working parameter, not a proven guarantee of platform profitability.
-
-A production deployment must test whether 7% covers its actual payment, mapping, communications, support, fraud, engineering, compliance and dispute-resolution costs at realistic trip volumes.
-
-## 11. Why does CGMP not solve every theoretical problem in advance?
-
-Every additional rule creates its own costs, incentives and failure modes.
-
-v1.2 therefore follows a deliberate anti-over-engineering principle:
-
-> Measure uncertain behavioral problems before adding new pricing or dispatch rules.
-
-Premium caps, rejecter bans, auction waiting windows, pickup-time fractions and latency handicaps remain possible experimental controls, but they are not part of the reference mechanism unless simulation or pilot evidence demonstrates a material need.
-
-
-## 12. Why is there no platform-selected default fallback ceiling?
-
-A platform-selected default such as "+20%" could become an anchor for both passengers and driver bidding strategies.
-
-v1.2 therefore provides **no default premium or default ceiling**. A passenger who wants Stage 3 must explicitly choose a private ceiling rule for that request or save one in advance. If no rule exists, fallback is not activated.
-
-This keeps the affordability decision with the passenger rather than allowing the platform to normalize a particular scarcity premium.
-
-
-## 13. What exactly does premium driver membership provide?
-
-Premium membership has exactly two reference benefits:
-
-1. advance demand-pattern forecasts; and
-2. priority access to scheduled-trip opportunities.
-
-It does not change ordinary live-trip pricing, commission, live dispatch priority, Stage 1 or Stage 2 treatment, or Stage 3 eligibility/clearing.
-
-Scheduled trips not accepted during the premium-priority window are automatically forwarded to eligible regular drivers. Premium therefore means earlier access to future scheduled work, not exclusive access.
-
-## 14. Why are high-profit long-distance scheduled trips rotated?
-
-A small number of drivers should not repeatedly capture the most profitable scheduled opportunities merely because they are fastest to respond or already have premium access.
-
-For qualifying high-value long-distance scheduled trips, a configurable lookback `L_fair` is used. The v1.2 reference default is 7 days, but the deployed value is published and can be recalibrated from observed trip frequency, allocation concentration and availability.
-
-A driver who completed a qualifying trip during the previous `L_fair` days is temporarily deprioritized while another otherwise eligible driver without a recent qualifying trip is available.
-
-The intended order is:
-
-```text
-premium drivers without a recent qualifying trip
-    ->
-regular drivers without a recent qualifying trip
-    ->
-recently served eligible drivers
-```
-
-Within an equivalent pool, the least recently served driver receives earlier opportunity. If no other driver is available or accepts, the recent-trip restriction is relaxed.
-
-The qualifying distance/value threshold and the effective `L_fair` value must be objective, published and auditable. v1.2 keeps 7 days only as the reference default rather than a permanent rule.
-
-## 15. Why forecast demand instead of using price surge to reposition drivers?
-
-A demand forecast can help drivers plan where and when to work **before** a shortage appears, without changing passenger fares.
-
-Forecasts may use historical patterns and known signals such as weather, school times, public-transport arrivals and scheduled commitments. They should be presented probabilistically and, where practical, adjusted for expected available supply.
-
-This is a planning layer rather than a scarcity-price multiplier. Stage 3 remains the exceptional mechanism for actual requests that deterministic dispatch cannot clear.
+## Can 7% support the platform?
+That remains empirical. Payment, maps, communications, support, fraud, engineering, compliance and dispute-resolution costs must be measured at realistic volume.
