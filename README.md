@@ -170,6 +170,16 @@ This is a **testable hypothesis**, not a proven safety outcome. A pilot should m
     └── CGMP-v1.0-draft.md
 ```
 
+## Project attribution
+
+**Formal creator:** CGMP Project  
+**Project maintainer / publication custodian:** gihan-kanishka  
+**AI assistance:** OpenAI ChatGPT (GPT-5.6 Sol)
+
+CGMP was developed through iterative human-AI collaboration. OpenAI ChatGPT was used extensively for formalization of the pricing and dispatch architecture, technical and economic analysis, literature synthesis, reference-code development, documentation, and manuscript drafting. Human contribution included conceptual direction, requirements, design decisions, review, and authorization of the public release.
+
+The AI system is not an author and cannot assume responsibility for the work. Publication responsibility remains with the human project maintainer. For citation purposes, use **CGMP Project** as the creator.
+
 ## Preprint
 
 A publication-oriented design preprint with literature review and references is available in [preprint/CGMP-v1.0-preprint.md](preprint/CGMP-v1.0-preprint.md).
