@@ -199,6 +199,7 @@ The 25 km/h figure is an estimation benchmark, not a production pricing speed.
 ├── config/
 │   └── cgmp-v1.example.json
 ├── docs/
+│   ├── DESIGN_QA.md
 │   ├── EVIDENCE_AND_VALIDATION.md
 │   └── LICENSING.md
 ├── specification/
@@ -221,6 +222,12 @@ The 25 km/h figure is an estimation benchmark, not a production pricing speed.
     ├── CGMP-v1.1-draft.md
     └── CGMP-v1.2-draft.md
 ```
+
+## Design Q&A
+
+A concise explanation of recurring design objections and responses is maintained in [docs/DESIGN_QA.md](docs/DESIGN_QA.md). The same material appears as **Appendix A: Frequently Raised Design Questions** in the current preprint.
+
+The Q&A is explanatory. It does not add new fare or dispatch rules.
 
 ## Project attribution
 
