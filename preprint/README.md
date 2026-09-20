@@ -4,38 +4,39 @@ This directory contains publication-oriented CGMP design preprints.
 
 ## Current version
 
-**CGMP v1.1-preprint** is the current working publication version.
+**CGMP v1.2-preprint** is the current working publication version.
 
 Primary source:
 
+- `CGMP-v1.2-preprint.md`
+
+Historical sources:
+
 - `CGMP-v1.1-preprint.md`
-
-Historical source:
-
 - `CGMP-v1.0-preprint.md`
 
 Zenodo submission metadata:
 
 - `ZENODO_SUBMISSION.md`
 
-## Status
+## v1.2 focus
 
-CGMP remains a design and simulation framework. It has not yet been validated by a live controlled pilot.
+v1.2 keeps the v1.1 fare calibration and three-stage dispatch architecture but removes pressure to solve every hypothetical behavioral problem in advance.
 
-v1.1 materially revises fare calibration and dispatch sequencing:
+It adds only the definitions needed to make the core reproducible:
 
-- representative ICE economics set the tariff benchmark;
-- passenger time rate is Rs 12.90/min;
-- minimum trip and initial pickup allowance are both 2 km;
-- search expands in 2 km increments;
-- expanded search remains deterministic;
-- sealed bidding is enabled only after authorized deterministic expanded search fails;
-- class-specific vehicle headroom may be competitively tuned without crossing the economic floor.
+- pickup time is explicitly not charged;
+- ICE class costs require a dated component breakdown before production;
+- competitive headroom is reviewed periodically using ordinary/non-scarcity competitor fares;
+- billable passenger-trip time is operationally defined;
+- `F0_i`, `M_i` and `b_i` are explicitly gross passenger-facing, driver-specific where pickup differs;
+- commission treatment is explicit;
+- uncertain strategic/latency/premium issues remain monitoring and simulation questions.
 
 ## Recommended publication path
 
-1. Run strategic simulation using the v1.1 reference implementation.
-2. Publish the v1.1 design preprint on Zenodo under CC BY 4.0 when ready.
-3. Keep reference software under Apache-2.0.
-4. Use the Zenodo DOI in later citations and versions.
+1. Run the focused v1.2 strategic simulation.
+2. Complete the empirical ICE cost component table and labour-benchmark derivation.
+3. Publish the v1.2 design preprint on Zenodo under CC BY 4.0.
+4. Keep reference software under Apache-2.0.
 5. Follow with controlled operator pilot evidence before making superiority or safety claims.
