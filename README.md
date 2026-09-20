@@ -2,16 +2,16 @@
 
 **CGMP** is an open framework for transparent ride-hailing fare calibration and exceptional dispatch.
 
-> Costs set the economic floor; competition may tune the margin above that floor; scarcity pricing is reserved for trips that fail deterministic dispatch.
+> Costs set the economic floor; competition may tune the margin above that floor; scarcity price discovery is reserved for trips that fail deterministic dispatch.
 
 ## Status
 
-**Version:** v1.1-preprint  
+**Version:** v1.2-preprint  
 **Date:** 2026-09-20  
-**Stage:** design preprint; simulation and live-pilot validation pending  
+**Stage:** design preprint; strategic simulation and live-pilot validation pending  
 **Evidence status:** not yet validated by a live controlled pilot
 
-All numerical values below are current modelling assumptions. Production deployment requires local fleet, platform-cost, trip and competitor-fare data.
+v1.2 deliberately keeps the operational core small. Potential behavioral problems are measured before new pricing rules are added.
 
 ## Current reference calibration
 
@@ -25,44 +25,11 @@ Passenger-facing rates are grossed up for a **7% platform commission**.
 | Compact | Rs 34.00 | Rs 15 | **Rs 53.00/km** |
 | Sedan | Rs 36.10 | Rs 21 | **Rs 61.50/km** |
 
-Passenger time rate: **Rs 12.90/minute**, yielding approximately **Rs 12.00/minute net to the driver after 7% commission**.
+Passenger-trip time rate: **Rs 12.90/minute**, yielding approximately **Rs 12.00/minute net to the driver after 7% commission**.
 
-The current class headrooms are competitive calibration targets, not immutable constants. They may be adjusted against observed competitor passenger fares, but the underlying economic floor must not be crossed.
+The current routine ICE cost figures are provisional aggregate modelling assumptions. A production calibration must publish the dated component inputs used to derive them.
 
-## Calibration rule
-
-For vehicle class `c`:
-
-```text
-passenger_distance_rate_c =
-    (representative_ICE_routine_cost_c + target_net_vehicle_headroom_c)
-    / (1 - commission_rate)
-```
-
-The published rate may be rounded upward to a transparent billing increment.
-
-For labour:
-
-```text
-passenger_time_rate =
-    target_net_driver_labour_per_minute / (1 - commission_rate)
-```
-
-Current labour target: **Rs 12 net/minute**.
-
-EVs and unusually efficient vehicles do **not** set the passenger tariff. CGMP calibrates the class rate from representative ICE economics; owners of more efficient vehicles retain their efficiency advantage.
-
-## Minimum fare and pickup
-
-The current reference policy is:
-
-- minimum passenger-trip distance charged: **2 km**;
-- initial pickup/search allowance: **2 km**;
-- pickup time: **not charged**;
-- search expansion: **2 km increments**;
-- pickup beyond 2 km: charged at the **actual authorized pickup distance**, not the full search-band ceiling.
-
-The ordinary fare is:
+## Core fare
 
 ```text
 F =
@@ -71,74 +38,133 @@ F =
   + pre-agreed_long_distance_provision
 ```
 
-For a very short trip, the minimum distance component therefore represents **2 km passenger travel + 2 km pickup**.
+Reference policy:
+
+- minimum passenger-trip distance: **2 km**;
+- included initial pickup/search distance: **2 km**;
+- pickup time: **not charged**;
+- search expansion: **2 km increments**;
+- expanded pickup: billed at actual authorized distance, not the search-band ceiling.
+
+### Why pickup time is not charged
+
+Pickup time is intentionally not monetized in v1.2. Before the ride starts, the passenger already bears the service cost of waiting for the vehicle. CGMP compensates the vehicle movement through the pickup-distance charge but does not add a second passenger charge for pickup minutes.
+
+Whether this reduces driver acceptance of distant pickups is a **pilot metric**, not a reason to add another tariff component before evidence exists.
+
+## ICE cost calibration
+
+The class cost input should ultimately be derived from dated, auditable ICE operating-cost components such as:
+
+```text
+routine_ICE_cost_per_km =
+    fuel_cost_per_km
+  + tyres_per_km
+  + scheduled_service_per_km
+  + brakes_suspension_repairs_per_km
+  + other_defined_routine_wear_per_km
+```
+
+The repository does **not** invent a component breakdown for the current provisional aggregate figures. That empirical breakdown is required before production deployment.
+
+EV and unusually efficient vehicle costs do not set the passenger tariff. Their owners retain the efficiency saving.
+
+## Competitive calibration
+
+Class-specific vehicle headroom is a competitive tuning variable **above the economic floor**.
+
+Competitive recalibration must be:
+
+- **periodic and scheduled**, not real-time;
+- based on standardized comparable **ordinary/non-scarcity competitor fares**;
+- versioned and auditable;
+- prohibited from pushing the tariff below the economic floor.
+
+CGMP therefore does not use competitor surge observations as an input to immediate fare changes.
+
+## Trip-time measurement
+
+The reference fare is metered on legitimate passenger-trip time.
+
+- billable time begins when the passenger trip starts after pickup;
+- billable time ends when the passenger trip ends;
+- pickup time is excluded;
+- server timestamps, route/GPS data and trip state are used to validate the interval;
+- implausible or disputed intervals are flagged for review rather than silently accepted.
+
+An upfront fare shown before acceptance is an **estimate** based on expected route and time. The final v1.2 reference fare uses verified actual passenger-trip time. A deployment that legally or commercially guarantees a fixed upfront price is a documented implementation variant.
+
+CGMP therefore claims **no automatic scarcity multiplier**, not "no multiplier of any kind": congestion can increase the fare because it increases legitimate paid trip time.
 
 ## Dispatch architecture
 
-### Stage 1 - normal nearby search
+### Stage 1 - deterministic nearby search
 
-Search eligible drivers within **0-2 km** at the deterministic CGMP fare. No additional passenger confirmation is required for the included pickup band.
+Search eligible drivers within **0-2 km** at the published CGMP fare.
 
-### Stage 2 - passenger-authorized expanded search
+### Stage 2 - passenger-authorized deterministic expansion
 
-If no match is obtained, expand in **2 km increments**:
+If unmatched, expand in **2 km increments**:
 
 ```text
 0-2 km -> 2-4 km -> 4-6 km -> 6-8 km -> ...
 ```
 
-The passenger can approve each expansion with one click or save standing preferences such as:
+The passenger can approve expansion directly or save automatic limits.
 
-- automatically expand up to a chosen radius;
-- maximum pickup cost;
-- maximum pickup distance.
+No bidding occurs during Stage 2.
 
-Expanded pickup is still deterministic CGMP pricing. **No bidding occurs merely because the search radius expanded.**
+### Stage 3 - exceptional sealed fallback
 
-### Stage 3 - exceptional sealed dispatch
+Only after authorized deterministic expanded search fails may the request enter sealed fallback.
 
-Sealed bidding is enabled only after the passenger-authorized deterministic expanded-search process fails to obtain a vehicle.
+For candidate driver `i`:
 
-The passenger can define a private maximum willingness-to-pay allowance using:
+- `F0_i` = gross passenger-facing deterministic fare using that driver's actual authorized pickup;
+- `M_i` = private passenger maximum produced by the passenger's saved/selected ceiling rule applied to `F0_i`;
+- `b_i` = gross passenger-facing fallback offer.
 
-- a percentage above the deterministic base fare;
-- a fixed additional amount per passenger-trip kilometre;
-- a fixed additional fee by trip-distance band.
-
-The platform does not expose this ceiling to drivers.
-
-Drivers configure private automatic fallback rules while parked. The first server-valid qualifying offer inside the passenger ceiling clears immediately.
+A valid offer satisfies:
 
 ```text
-baseline <= first qualifying offer <= passenger ceiling
+F0_i <= b_i <= M_i
 ```
 
-The fallback is intended to be exceptional. A high fallback-activation rate is a signal to investigate fare calibration, supply conditions or strategic rejection.
+The first server-valid qualifying offer clears immediately.
 
-## Competitive calibration and the hard floor
+No automatic rejecter ban, premium cap, latency correction or alternative auction window is part of the v1.2 core. Those are possible controls only if simulation or pilot evidence shows a material problem.
 
-CGMP may compare standardized benchmark trips with competitor platforms and tune the **vehicle headroom** to keep passenger fares commercially attractive.
+## Commission treatment
 
-Competition is not allowed to push the tariff below the economic floor:
+The **7% commission applies to commissionable passenger fare**, including:
 
-```text
-actual published rate =
-    max(economic-floor rate, competitively calibrated rate)
-```
+- distance charges;
+- passenger-trip time charges;
+- any fallback premium.
 
-The hard floor protects:
+Direct third-party/pass-through expenses such as an actual toll or explicitly reimbursed accommodation cost may be designated **commission-exempt**. They must be separately identified in the fare breakdown.
 
-- representative ICE routine operating cost;
-- the published net driver-labour target;
-- the transparent commission required by the platform.
+## What is monitored instead of over-engineered
 
-The current 7% commission is a working business parameter and should be validated against payments, maps, support, fraud, communications, engineering, compliance and dispute-resolution costs.
+v1.2 measures before adding corrective rules:
+
+- deterministic acceptance/rejection;
+- acceptance by pickup-distance band;
+- total request-to-match time;
+- passenger abandonment at each stage;
+- fallback activation rate;
+- fallback premium distribution;
+- proximity of clearing offers to passenger ceilings;
+- repeated reject-then-fallback participation;
+- device/network latency versus fallback win rate;
+- driver net earnings and utilization;
+- platform sustainability at 7%;
+- speeding/aggressive-driving indicators;
+- unexplained excess journey time.
 
 ## Reference examples
 
-At the **25 km/h reference speed**, Rs 12.90/min is equivalent to **Rs 30.96 per passenger-trip km** of time compensation.
-
-Effective passenger-trip rate at that reference speed, before pickup:
+At **25 km/h**, Rs 12.90/min is equivalent to **Rs 30.96 per passenger-trip km**.
 
 | Class | Distance component/km | Time equivalent/km | Effective trip rate/km |
 |---|---:|---:|---:|
@@ -148,7 +174,7 @@ Effective passenger-trip rate at that reference speed, before pickup:
 | Compact | Rs 53.00 | Rs 30.96 | **Rs 83.96** |
 | Sedan | Rs 61.50 | Rs 30.96 | **Rs 92.46** |
 
-A **13 km trip + 2 km pickup** at the same 25 km/h reference trip speed (31.2 passenger minutes) gives:
+For a **13 km trip + 2 km pickup** at the same 25 km/h reference trip speed:
 
 | Class | Estimated passenger fare |
 |---|---:|
@@ -158,20 +184,7 @@ A **13 km trip + 2 km pickup** at the same 25 km/h reference trip speed (31.2 pa
 | Compact | **Rs 1,197.48** |
 | Sedan | **Rs 1,324.98** |
 
-These are estimates for comparison. Production fares use verified legitimate trip time.
-
-## Design principles
-
-1. **Distance pays for the vehicle; time pays for the human.**
-2. **Economic floors are protected before competitive tuning.**
-3. **Ordinary and expanded-search fares remain deterministic.**
-4. **Search radius and billing distance are separate:** search expands by bands, billing uses actual authorized pickup distance.
-5. **Scarcity price discovery is a last-resort mechanism, not a normal fare multiplier.**
-6. **Passengers control their private fallback affordability ceiling.**
-7. **Drivers control their private automated willingness-to-serve rules.**
-8. **Efficient drivetrains retain their savings; ICE class economics set the tariff benchmark.**
-9. **Fare-critical route, time, distance and fallback ordering should be server authoritative.**
-10. **Safety, strategic rejection, latency fairness and economic sustainability are empirical questions for simulation and pilots.**
+The 25 km/h figure is an estimation benchmark, not a production pricing speed.
 
 ## Repository layout
 
@@ -201,10 +214,12 @@ These are estimates for comparison. Production fares use verified legitimate tri
 ├── preprint/
 │   ├── CGMP-v1.0-preprint.md
 │   ├── CGMP-v1.1-preprint.md
+│   ├── CGMP-v1.2-preprint.md
 │   └── ZENODO_SUBMISSION.md
 └── whitepaper/
     ├── CGMP-v1.0-draft.md
-    └── CGMP-v1.1-draft.md
+    ├── CGMP-v1.1-draft.md
+    └── CGMP-v1.2-draft.md
 ```
 
 ## Project attribution
@@ -213,19 +228,8 @@ These are estimates for comparison. Production fares use verified legitimate tri
 **Project maintainer / publication custodian:** gihan-kanishka  
 **AI assistance:** OpenAI ChatGPT (GPT-5.6 Sol)
 
-CGMP was developed through iterative human-AI collaboration. OpenAI ChatGPT was used extensively for formalization, analysis, literature synthesis, reference-code development, documentation and manuscript drafting. Human contribution included conceptual direction, requirements, design decisions, review and authorization of the public release.
-
-The AI system is not an author and cannot assume responsibility for the work. Publication responsibility remains with the human project maintainer. For citation purposes, use **CGMP Project** as the creator.
-
 ## Preprint
 
-The current publication-oriented source is [preprint/CGMP-v1.1-preprint.md](preprint/CGMP-v1.1-preprint.md).
+The current publication-oriented source is [preprint/CGMP-v1.2-preprint.md](preprint/CGMP-v1.2-preprint.md).
 
-Zenodo metadata is maintained in [preprint/ZENODO_SUBMISSION.md](preprint/ZENODO_SUBMISSION.md).
-
-## Licensing
-
-Reference software: **Apache License 2.0**.  
-Documentation/specification/preprint unless otherwise stated: **CC BY 4.0**.
-
-See [LICENSING.md](docs/LICENSING.md).
+Reference software is licensed under **Apache License 2.0**. Documentation/specification/preprint unless otherwise stated is **CC BY 4.0**.
