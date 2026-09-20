@@ -159,19 +159,19 @@ Premium membership does **not** change ordinary live-trip dispatch priority, liv
 
 Scheduled trips are first exposed to eligible premium drivers for a published priority window. Unclaimed trips are then automatically forwarded to eligible regular drivers.
 
-For qualifying **high-value long-distance scheduled trips**, a 7-day fairness rotation applies. Drivers who completed a qualifying trip during the previous 7 days are deprioritized while another otherwise eligible driver without a recent qualifying trip is available. The intended opportunity order is:
+For qualifying **high-value long-distance scheduled trips**, a configurable fairness lookback `L_fair` applies. The v1.2 reference default is **7 days**, but the deployed value must be published and may be recalibrated from observed fairness and availability data. Drivers who completed a qualifying trip during the previous `L_fair` days are deprioritized while another otherwise eligible driver without a recent qualifying trip is available. The intended opportunity order is:
 
 ```text
-premium drivers without a qualifying trip in the previous 7 days
+premium drivers without a qualifying trip in the previous L_fair days
     ->
-regular drivers without a qualifying trip in the previous 7 days
+regular drivers without a qualifying trip in the previous L_fair days
     ->
 recently served eligible drivers
 ```
 
 Within an equivalent pool, the least recently served driver receives earlier opportunity. If no other driver is available or accepts, the recent-trip restriction is relaxed so passenger fulfilment is not sacrificed.
 
-The exact qualifying long-distance/high-value threshold and premium-priority window are deployment parameters and must be published before production.
+The exact qualifying long-distance/high-value threshold, premium-priority window and fairness lookback `L_fair` are deployment parameters and must be published before production.
 
 Demand forecasts are planning information, not guarantees or price multipliers. Where practical, they should account for expected available supply and existing scheduled commitments so the system does not encourage unnecessary driver herding.
 
