@@ -47,7 +47,7 @@ Pickup time is not billable.
 
 | Class | Passenger distance rate |
 |---|---:|
-| Bike | Rs 19.00/km |
+| Bike | Rs 15.00/km |
 | Tuk | Rs 37.00/km |
 | Mini | Rs 51.50/km |
 | Compact | Rs 53.00/km |
@@ -59,13 +59,31 @@ Current provisional routine ICE cost assumptions:
 
 | Class | Routine ICE cost/km |
 |---|---:|
-| Bike | Rs 14.50 |
+| Bike | Rs 10.50 |
 | Tuk | Rs 22.10 |
 | Mini | Rs 32.80 |
 | Compact | Rs 34.00 |
 | Sedan | Rs 36.10 |
 
 A production calibration must publish the dated underlying inputs used to derive these aggregates.
+
+### 4.1 Provisional Bike recalibration
+
+The Bike class is benchmarked to an economical commuter motorcycle rather than a larger motorcycle or scooter.
+
+For the v1.2 working calibration:
+
+```text
+Petrol 92 reference price = Rs 399/litre
+conservative working fuel economy = 60 km/litre
+fuel cost = 399 / 60 = Rs 6.65/km
+pooled non-fuel routine-wear reserve = Rs 3.85/km
+provisional Bike routine cost = Rs 10.50/km
+```
+
+The 60 km/l assumption is deliberately below manufacturer-reported 75-80 km/l figures for economical 100 cc commuter motorcycles, allowing for pillion load, stop-start operation and real-world ride-hailing use.
+
+The Rs 3.85/km non-fuel reserve is still a provisional aggregate covering tyres, scheduled service, chain/sprockets, brakes, suspension/repairs and other routine wear. It must be replaced by a dated fleet-derived component table before production.
 
 The intended component structure is:
 
