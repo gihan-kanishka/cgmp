@@ -59,7 +59,7 @@ def _vehicle(name: str, cost: float, headroom: float) -> VehicleClass:
 
 
 DEFAULT_CLASSES = {
-    "bike": _vehicle("bike", 14.50, 3.0),
+    "bike": _vehicle("bike", 10.50, 3.0),
     "tuk": _vehicle("tuk", 22.10, 12.0),
     "mini": _vehicle("mini", 32.80, 15.0),
     "compact": _vehicle("compact", 34.00, 15.0),
