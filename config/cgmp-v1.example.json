@@ -155,5 +155,49 @@
       "acceptance_to_driver_cancellation_time",
       "passenger_rematch_or_abandonment_after_driver_cancellation"
     ]
+  },
+  "premium_driver_planning": {
+    "enabled": true,
+    "benefits": [
+      "advance_demand_pattern_forecasts",
+      "priority_access_to_scheduled_trips"
+    ],
+    "ordinary_live_dispatch_priority_changed": false,
+    "live_trip_fares_changed": false,
+    "commission_changed": false,
+    "stage_3_treatment_changed": false,
+    "demand_forecasts": {
+      "day_prior_supported": true,
+      "probabilistic_not_guaranteed": true,
+      "supply_aware_where_practical": true,
+      "possible_inputs": [
+        "historical_trip_patterns",
+        "weather_forecasts",
+        "school_times",
+        "scheduled_train_or_public_transport_arrivals",
+        "major_events",
+        "expected_driver_availability",
+        "scheduled_trip_commitments"
+      ]
+    },
+    "scheduled_trips": {
+      "premium_priority_access": true,
+      "premium_priority_window": "published_implementation_parameter",
+      "unclaimed_forward_to_regular_drivers": true,
+      "priority_must_not_jeopardize_on_time_assignment": true,
+      "high_value_long_distance_fairness": {
+        "enabled": true,
+        "qualifying_threshold": "published_deployment_parameter",
+        "lookback_days": 7,
+        "recently_served_deprioritized": true,
+        "least_recently_served_first_within_equivalent_pool": true,
+        "availability_override": true,
+        "access_sequence": [
+          "premium_not_served_with_qualifying_trip_in_previous_7_days",
+          "regular_not_served_with_qualifying_trip_in_previous_7_days",
+          "recently_served_eligible_drivers"
+        ]
+      }
+    }
   }
 }
