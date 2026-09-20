@@ -1,76 +1,25 @@
-# Integrity and Monitoring Controls - v1.2
+# Integrity and Monitoring Controls - v1.4
 
-CGMP v1.2 prefers measurement over speculative rule accumulation.
+## Server-authoritative meter
 
-## Server-authoritative inputs
+Validate pickup route/distance, passenger-trip route/distance, server timestamps, trip state, vehicle class, personal-stop pause events, destination changes and long-distance eligibility.
 
-Where practical, the platform should validate:
+## Personal stops
 
-- pickup route and distance;
-- passenger-trip route and distance;
-- passenger-trip start/end timestamps;
-- trip state;
-- vehicle class;
-- search stage and passenger authorization;
-- long-distance provision;
-- fallback eligibility;
-- fallback offer order.
+A driver personal stop during an active passenger trip requires the time meter to be paused. Both driver and passenger apps must show a persistent pause notification and a resume notification. Clear non-service detour distance should be excluded at reconciliation.
 
-## Trip-time integrity
+## Meter farming
 
-The time charge applies only to the passenger-trip interval.
+Flag repeated unexplained loops, route stretching, avoidable stationary time, impossible timestamps and systematic excess duration compared with comparable traffic conditions. A single unusual trip is not proof of abuse; repeated patterns carry more evidentiary weight.
 
-Potential anomalies such as unexplained stops, route stretching, repeated excessive duration or impossible timestamps should be flagged for review.
+## Cancellation integrity
 
-A single unusual trip is not sufficient evidence of manipulation.
+Record acceptance, movement toward pickup, passenger cancellation, driver cancellation, no-show state, validated pickup distance and settlement amount. Repeated suspicious same-party cancellation patterns should be reviewable.
 
-## Search integrity
+## Long-distance integrity
 
-Record each search stage and authorization so total matching delay can be measured from **initial request creation**, not only from fallback activation.
+Record provisional accrual, final reconciliation, route/destination eligibility and immediate same-passenger/same-driver continuations. Driver-created lateness must not produce an extra long-distance reward on top of the time meter.
 
-## Strategic rejection
+## Cash ledger integrity
 
-v1.2 does not automatically bar a driver who rejected the deterministic request from later fallback participation.
-
-Instead, measure:
-
-- deterministic rejection;
-- later participation on the same request;
-- repeated reject-then-premium patterns;
-- area/time clustering.
-
-A same-request exclusion rule may be tested later if evidence shows material gaming.
-
-## Post-acceptance cancellation and multi-homing
-
-Drivers may use multiple platforms. A driver can therefore accept a CGMP request and later cancel if another opportunity becomes more attractive.
-
-v1.2 does not add a platform-exclusivity rule. Instead, measure:
-
-- post-acceptance driver cancellation rate;
-- time from acceptance to driver cancellation;
-- repeated cancellation patterns by driver, area and time;
-- whether cancellations are concentrated in Stage 2 or Stage 3;
-- passenger rematch and abandonment after driver cancellation.
-
-These metrics can reveal reliability problems consistent with multi-homing without assuming the cause of every cancellation.
-
-## First-qualifying latency
-
-Use an authoritative server ordering rule and measure the relationship between network/device latency and fallback wins.
-
-No latency correction is part of the v1.2 reference mechanism unless evidence shows material bias.
-
-## Competitive-calibration integrity
-
-Competitive headroom changes must be:
-
-- scheduled rather than real-time;
-- based on standardized ordinary/non-scarcity competitor observations;
-- versioned;
-- auditable;
-- constrained by the economic floor.
-
-## Publication principle
-
-Adverse findings should be retained and reported. Monitoring is useful only if the project is willing to change the design when evidence contradicts its assumptions.
+Record cash commission debt, direct settlements, electronic offsets, warnings, threshold hits and cash-trip restrictions.
