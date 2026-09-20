@@ -1,4 +1,8 @@
-"""Reference calculator for CGMP v1.1-preprint."""
+"""Reference calculator for CGMP v1.2-preprint.
+
+The reference implementation intentionally keeps the core mechanism small.
+Behavioral concerns are measured before adding corrective pricing rules.
+"""
 
 from dataclasses import dataclass
 from math import ceil
@@ -77,6 +81,11 @@ def ordinary_fare(
     long_distance_provision: float = 0.0,
     time_rate_per_min: float = DEFAULT_TIME_RATE_PER_MIN,
 ) -> float:
+    """Return the gross passenger-facing deterministic fare.
+
+    trip_minutes is passenger-trip time only. Pickup time is intentionally
+    excluded from the v1.2 reference tariff.
+    """
     if vehicle_class not in DEFAULT_CLASSES:
         raise ValueError(f"unknown vehicle class: {vehicle_class}")
     if trip_minutes < 0 or long_distance_provision < 0 or time_rate_per_min < 0:
@@ -120,19 +129,46 @@ def effective_passenger_rate_per_trip_km(
 ) -> float:
     if vehicle_class not in DEFAULT_CLASSES:
         raise ValueError(f"unknown vehicle class: {vehicle_class}")
+    if reference_speed_kmph <= 0:
+        raise ValueError("reference_speed_kmph must be positive")
     time_equivalent = (60 / reference_speed_kmph) * DEFAULT_TIME_RATE_PER_MIN
     return round(DEFAULT_CLASSES[vehicle_class].distance_rate_per_km + time_equivalent, 2)
 
 
-def driver_receipt(
-    passenger_fare: float,
+def commission_amount(
+    gross_passenger_fare: float,
+    commission_exempt_amount: float = 0.0,
     commission_rate: float = DEFAULT_COMMISSION_RATE,
 ) -> float:
-    if passenger_fare < 0:
-        raise ValueError("passenger_fare cannot be negative")
+    """Commission applies only to commissionable fare.
+
+    Direct pass-through amounts may be excluded if the implementation marks
+    them as commission-exempt before the ride is accepted.
+    """
+    if gross_passenger_fare < 0 or commission_exempt_amount < 0:
+        raise ValueError("fare amounts cannot be negative")
+    if commission_exempt_amount > gross_passenger_fare:
+        raise ValueError("commission_exempt_amount cannot exceed fare")
     if not 0 <= commission_rate < 1:
         raise ValueError("commission_rate must be in [0, 1)")
-    return round(passenger_fare * (1 - commission_rate), 2)
+    commissionable = gross_passenger_fare - commission_exempt_amount
+    return round(commissionable * commission_rate, 2)
+
+
+def driver_receipt(
+    gross_passenger_fare: float,
+    commission_exempt_amount: float = 0.0,
+    commission_rate: float = DEFAULT_COMMISSION_RATE,
+) -> float:
+    return round(
+        gross_passenger_fare
+        - commission_amount(
+            gross_passenger_fare,
+            commission_exempt_amount=commission_exempt_amount,
+            commission_rate=commission_rate,
+        ),
+        2,
+    )
 
 
 def net_vehicle_headroom_per_km(
@@ -145,48 +181,51 @@ def net_vehicle_headroom_per_km(
 
 
 def search_radius_for_stage(stage: int) -> float:
-    """Stage 1 is 0-2 km, stage 2 is 0-4 km, and so on."""
+    """Stage 1 is 0-2 km, stage 2 reaches 0-4 km, and so on."""
     if stage < 1:
         raise ValueError("stage must be >= 1")
     return stage * SEARCH_BAND_KM
 
 
 def passenger_ceiling(
-    base_fare: float,
+    driver_specific_baseline_fare: float,
     trip_km: float,
     mode: str,
     value: float,
-    distance_band_fee: Optional[float] = None,
 ) -> float:
-    if base_fare < 0 or trip_km < 0 or value < 0:
+    """Apply the passenger's private rule to driver-specific F0_i."""
+    if driver_specific_baseline_fare < 0 or trip_km < 0 or value < 0:
         raise ValueError("inputs cannot be negative")
     if mode == "percentage_above_base":
-        return round(base_fare * (1 + value), 2)
+        return round(driver_specific_baseline_fare * (1 + value), 2)
     if mode == "fixed_amount_per_trip_km_above_base":
-        return round(base_fare + trip_km * value, 2)
+        return round(driver_specific_baseline_fare + trip_km * value, 2)
     if mode == "fixed_fee_by_trip_distance_band":
-        fee = value if distance_band_fee is None else distance_band_fee
-        return round(base_fare + fee, 2)
+        return round(driver_specific_baseline_fare + value, 2)
     raise ValueError(f"unknown passenger ceiling mode: {mode}")
 
 
 def first_qualifying_bid(
-    baseline_fare: float,
-    passenger_max: float,
-    bids_in_authoritative_order: Iterable[float],
+    driver_specific_baseline_fare: float,
+    passenger_max_for_driver: float,
+    gross_bids_in_authoritative_order: Iterable[float],
     deterministic_expanded_search_failed: bool,
 ) -> Optional[float]:
-    """Clear only after authorized deterministic expanded search has failed."""
+    """Return first qualifying gross passenger-facing fallback offer.
+
+    Fallback is locked until the authorized deterministic expanded-search
+    process has failed.
+    """
     if not deterministic_expanded_search_failed:
         return None
-    if baseline_fare < 0 or passenger_max < 0:
+    if driver_specific_baseline_fare < 0 or passenger_max_for_driver < 0:
         raise ValueError("fares cannot be negative")
-    if passenger_max < baseline_fare:
+    if passenger_max_for_driver < driver_specific_baseline_fare:
         return None
 
-    for bid in bids_in_authoritative_order:
+    for bid in gross_bids_in_authoritative_order:
         bid = float(bid)
-        if baseline_fare <= bid <= passenger_max:
+        if driver_specific_baseline_fare <= bid <= passenger_max_for_driver:
             return round(bid, 2)
     return None
 
