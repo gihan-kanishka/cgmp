@@ -1,14 +1,14 @@
-# Zenodo submission metadata - CGMP v1.1
+# Zenodo submission metadata - CGMP v1.2
 
 ## Required fields
 
 **Resource type:** Publication -> Preprint
 
-**Title:** Cost-Grounded Mobility Pricing (CGMP): A Cost-Grounded Fare, Progressive-Search and Exceptional-Dispatch Framework for Ride-Hailing
+**Title:** Cost-Grounded Mobility Pricing (CGMP): A Minimal Cost-Grounded Fare, Progressive-Search and Exceptional-Dispatch Framework for Ride-Hailing
 
 **Publication date:** 2026-09-20
 
-**Version:** v1.1-preprint
+**Version:** v1.2-preprint
 
 **Creator:** CGMP Project
 
@@ -24,11 +24,13 @@
 
 ## Abstract / description
 
-Cost-Grounded Mobility Pricing (CGMP) is an open ride-hailing pricing and dispatch framework that separates ordinary trip pricing, passenger-authorized search expansion, and exceptional scarcity resolution. Passenger distance rates are calibrated from representative ICE class economics and class-specific competitive headroom, while a 7% platform commission is explicitly grossed into the tariff. The current passenger time rate of Rs 12.90/minute targets approximately Rs 12/minute net driver labour after commission.
+Cost-Grounded Mobility Pricing (CGMP) is an open ride-hailing pricing and dispatch framework that separates ordinary trip pricing, passenger-authorized search expansion, and exceptional scarcity resolution. Passenger distance rates are calibrated from representative ICE class economics and class-specific competitive headroom, while passenger-trip time is priced explicitly. The reference calibration uses a 7% platform commission and a passenger time rate of Rs 12.90/minute, targeting approximately Rs 12/minute net during the passenger trip.
 
-Dispatch begins with a deterministic 0-2 km search. If no match is obtained, the passenger can authorize search expansion in 2 km increments; expanded pickup remains deterministically priced at actual authorized distance. Sealed bidding is disabled during these stages. Only after the authorized deterministic expanded-search process fails can a private passenger ceiling and private automated driver offers be used. The first server-valid qualifying offer clears immediately.
+Dispatch begins with a deterministic 0-2 km search. If no match is obtained, the passenger may authorize search expansion in 2 km increments. Search bands determine candidate eligibility while actual authorized pickup distance determines billing. Pickup time is intentionally not monetized: the passenger already bears the pre-trip waiting cost and vehicle movement is compensated through pickup distance. Sealed bidding is disabled during deterministic expansion.
 
-Competitive passenger fares may tune class-specific vehicle headroom above the economic floor, but may not push the tariff below representative ICE operating cost, the published labour target, and disclosed platform economics. The framework is presented as a testable design proposal rather than a proven replacement for dynamic pricing.
+Only after authorized deterministic expanded search fails can a private passenger ceiling and private automated driver offers be used. Because pickup differs by candidate, the deterministic baseline `F0_i` and resulting private ceiling `M_i` may be driver-specific. The first server-valid gross passenger-facing offer satisfying `F0_i <= b_i <= M_i` clears immediately.
+
+v1.2 deliberately avoids preemptive premium caps, rejecter bans, lowest-offer windows and latency handicaps. These remain monitoring and simulation questions unless empirical evidence demonstrates a material problem. Competitive headroom is adjusted only through scheduled review using standardized ordinary/non-scarcity competitor fares and may not cross the economic floor.
 
 ## Keywords
 
@@ -36,13 +38,13 @@ Competitive passenger fares may tune class-specific vehicle headroom above the e
 - ride-sourcing
 - transport economics
 - mobility pricing
-- market design
 - progressive search
 - pickup pricing
 - sealed bidding
 - dispatch
 - driver incentives
 - platform governance
+- market design
 - gig economy
 
 ## Related identifier
@@ -51,8 +53,8 @@ Competitive passenger fares may tune class-specific vehicle headroom above the e
 
 ## Recommended files
 
-1. `CGMP_v1.1_preprint.pdf` - primary publication file
-2. `CGMP_v1.1_preprint.docx` - editable source (optional)
+1. `CGMP_v1.2_preprint.pdf`
+2. `CGMP_v1.2_preprint.docx`
 
 The reference implementation remains separately licensed under Apache-2.0.
 
@@ -62,6 +64,7 @@ Allow Zenodo to assign a DOI at publication. If a DOI is reserved in advance, it
 
 ## Notes
 
-- Design preprint; strategic simulation and live controlled-pilot validation pending.
+- Design preprint; focused strategic simulation and live controlled-pilot validation pending.
+- Aggregate ICE cost inputs are provisional until dated component calibration is completed.
 - Preprint/documentation license: CC BY 4.0.
 - Reference implementation license: Apache License 2.0.
