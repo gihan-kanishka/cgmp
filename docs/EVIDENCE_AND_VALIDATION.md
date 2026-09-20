@@ -1,58 +1,34 @@
-# Evidence and Validation Plan - v1.1
+# Evidence and Validation Plan - v1.2
 
-CGMP v1.1-preprint is a design framework, not a claim of proven superiority.
+CGMP v1.2 is a design framework, not a claim of proven superiority.
 
-## Architectural claims
+The core mechanism is intentionally kept small. Uncertain behavioral problems are measured before corrective rules are added.
 
-The rules directly establish that:
+## Before production calibration
 
-- ordinary fares are deterministic functions of published inputs;
-- current tariff calibration is based on representative ICE class economics;
-- the current time rate targets approximately Rs 12/min net driver labour after 7% commission;
-- the current minimum fare includes 2 km passenger distance and 2 km pickup;
-- search begins within 2 km and expands in 2 km increments;
-- expanded-search pickup is billed at actual authorized distance, not band ceiling;
-- expanded deterministic search does not itself activate bidding;
-- sealed bidding becomes eligible only after authorized deterministic expanded search fails;
-- passenger fallback ceilings can remain private;
-- driver offers can remain private and automated;
-- the first qualifying fallback offer can clear immediately.
+Collect and publish dated evidence for:
 
-## Claims requiring empirical validation
-
-A live pilot and strategic simulation are required to determine whether CGMP:
-
-- keeps passenger fares competitive;
-- provides sustainable driver net earnings;
-- supports a sustainable platform at 7% commission;
-- keeps fallback activation rare;
-- creates strategic deterministic-offer rejection;
-- changes passenger switching/cancellation behavior;
-- improves or worsens matching latency;
-- produces acceptable fairness under first-qualifying dispatch;
-- creates network-latency allocation bias;
-- changes speeding/aggressive-driving behavior;
-- creates deliberate slow-driving behavior;
-- improves long-distance completion.
-
-## Economic calibration data
-
-Before production use, collect:
-
-- current fuel prices;
+- fuel prices by relevant fuel type;
 - representative ICE fuel economy by class;
-- routine maintenance and wear per km;
-- representative fleet composition;
-- insurance/repair/irregular-loss data if a mandatory reserve is to be added;
-- driver utilization and idle-time distributions;
-- platform payments/maps/support/fraud/communications/engineering/compliance costs;
-- competitor passenger fares for standardized benchmark trips.
+- tyre cost/life;
+- scheduled servicing;
+- brakes, suspension and routine repairs;
+- other routine wear included in the class cost;
+- fleet composition used to define a representative class;
+- the economic basis for the Rs 12/min net passenger-trip labour target;
+- direct platform operating costs relevant to the 7% commission.
 
-EV costs may be measured for research, but they do not set the passenger tariff in the current reference design.
+Current aggregate ICE cost/km figures remain provisional until this breakdown exists.
 
-## Competitive calibration
+## Competitor calibration
 
-Benchmark comparable trips, for example:
+Use standardized comparable **ordinary/non-scarcity** fares.
+
+Do not use live competitor surge observations to make real-time CGMP changes.
+
+Benchmark at multiple trip distances and observed traffic conditions rather than relying only on the 25 km/h illustration.
+
+Suggested distances:
 
 - 2 km;
 - 5 km;
@@ -60,60 +36,64 @@ Benchmark comparable trips, for example:
 - 13 km;
 - 20 km.
 
-For each benchmark, record comparable pickup, trip time, vehicle class, fees and any dynamic-price state.
+## Core pilot metrics
 
-Competitive observations may tune the net vehicle headroom above the economic floor.
+### Matching and pickup
 
-Do not tune below the economic floor merely to match a competitor.
-
-## Recommended pilot metrics
-
-- passenger fare/trip and fare/km;
-- effective fare at standardized trip conditions;
-- driver net earnings per active hour after routine vehicle cost;
-- platform contribution after direct operating costs;
-- deterministic acceptance rate;
-- rejection rate by driver/area/time;
-- passenger and driver cancellation;
 - initial 0-2 km match rate;
-- match rate after each 2 km expansion;
-- passenger expansion-approval rate;
-- percentage of expansion handled by standing preferences;
-- actual pickup-distance distribution;
+- acceptance by pickup-distance band;
+- match rate after each expansion stage;
+- total request-to-match time;
+- time spent in each stage;
+- passenger abandonment/cancellation by stage;
+- actual pickup-distance distribution.
+
+### Fallback
+
 - fallback activation rate;
-- fallback activation-to-assignment latency;
-- fallback premium relative to deterministic base;
+- fallback premium distribution;
+- clearing premium as a percentage of driver-specific `F0_i`;
+- clearing-offer proximity to `M_i`;
 - fallback failure rate;
-- distribution of fallback assignments;
-- relationship between network latency and fallback win rate;
-- evidence of reject-and-wait behavior;
-- speeding events and aggressive-driving complaints;
+- request-to-fallback time;
+- fallback activation-to-assignment time;
+- reject-then-fallback participation;
+- network/device latency versus fallback win rate.
+
+### Economics
+
+- passenger fare per trip and per km;
+- driver net earnings per paid passenger-trip hour;
+- driver net earnings per online hour;
+- passenger-carrying utilization;
+- pickup time;
+- idle time;
+- platform contribution under 7% commission.
+
+The distinction between paid passenger-trip earnings and online-hour earnings must remain explicit.
+
+### Time and safety
+
+- actual versus expected passenger-trip time;
 - unexplained excess journey time;
-- slow-driving complaints;
-- long-distance acceptance/completion.
+- disputed time intervals;
+- speeding/aggressive-driving indicators;
+- slow-driving complaints.
 
-## Strategic simulation
+## Simulation priorities
 
-Before pilot deployment, simulate drivers with heterogeneous and learning strategies.
+A toy/agent-based simulation should test only the material uncertain mechanisms first:
 
-At minimum test:
+1. baseline acceptance versus reject-and-wait;
+2. fallback with and without same-request rejecter exclusion;
+3. first-qualifying clearing versus a short lowest-offer window comparator;
+4. unpaid pickup-time effects on Stage 2 acceptance;
+5. passenger abandonment as total matching time increases.
 
-- ordinary acceptance under viable baseline economics;
-- reject-and-wait strategies;
-- multi-homing to competitor platforms;
-- passenger abandonment/switching;
-- different fallback ceiling distributions;
-- thin versus dense markets;
-- first-qualifying latency effects.
+The simulation should not be used to justify adding controls automatically. It should identify whether a problem is large enough to deserve additional complexity.
 
-## Safety hypothesis
+## Decision rule
 
-Explicit time compensation may reduce the financial penalty of lawful speeds and congestion.
+If a problem is not materially present in simulation or pilot evidence, do not add a rule for it.
 
-This is a testable hypothesis, not a proven safety benefit. The opposite incentive to prolong trips must also be measured.
-
-## Publication standard
-
-Adverse results should be published alongside favorable results.
-
-A high fallback activation rate should be treated as evidence that the system requires recalibration or redesign, not as proof that scarcity premiums should simply become the new normal.
+That is the v1.2 anti-over-engineering principle.
