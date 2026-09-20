@@ -37,6 +37,10 @@ The reference implementation supports:
 
 The passenger ceiling is private.
 
+There is **no platform-selected default premium or default ceiling** in the v1.2 reference design. The passenger must explicitly choose a fallback ceiling rule for the request or save one in advance. If no passenger rule exists, Stage 3 is not activated.
+
+This avoids anchoring passengers to a platform-chosen premium.
+
 ## Driver offers
 
 Driver offers are private and may be generated automatically from preferences configured while parked.
