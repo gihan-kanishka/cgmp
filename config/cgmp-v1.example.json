@@ -17,9 +17,9 @@
     "tariff_basis": "representative_ICE_class_economics",
     "ignore_EV_costs_for_tariff_setting": true,
     "rate_rounding_increment": 0.5,
-    "target_net_driver_labour_per_min": 12.0,
+    "target_net_driver_labour_per_min": 12,
     "passenger_time_rate_per_min": 12.9,
-    "reference_speed_kmph_for_examples": 25.0,
+    "reference_speed_kmph_for_examples": 25,
     "routine_ICE_cost_formula_components": [
       "fuel_cost_per_km",
       "tyres_per_km",
@@ -31,27 +31,27 @@
     "classes": {
       "bike": {
         "routine_ICE_cost_per_km": 14.5,
-        "target_net_vehicle_headroom_per_km": 3.0,
-        "passenger_distance_rate_per_km": 19.0
+        "target_net_vehicle_headroom_per_km": 3,
+        "passenger_distance_rate_per_km": 19
       },
       "tuk": {
         "routine_ICE_cost_per_km": 22.1,
-        "target_net_vehicle_headroom_per_km": 12.0,
-        "passenger_distance_rate_per_km": 37.0
+        "target_net_vehicle_headroom_per_km": 12,
+        "passenger_distance_rate_per_km": 37
       },
       "mini": {
         "routine_ICE_cost_per_km": 32.8,
-        "target_net_vehicle_headroom_per_km": 15.0,
+        "target_net_vehicle_headroom_per_km": 15,
         "passenger_distance_rate_per_km": 51.5
       },
       "compact": {
-        "routine_ICE_cost_per_km": 34.0,
-        "target_net_vehicle_headroom_per_km": 15.0,
-        "passenger_distance_rate_per_km": 53.0
+        "routine_ICE_cost_per_km": 34,
+        "target_net_vehicle_headroom_per_km": 15,
+        "passenger_distance_rate_per_km": 53
       },
       "sedan": {
         "routine_ICE_cost_per_km": 36.1,
-        "target_net_vehicle_headroom_per_km": 21.0,
+        "target_net_vehicle_headroom_per_km": 21,
         "passenger_distance_rate_per_km": 61.5
       }
     },
@@ -62,16 +62,28 @@
       "exclude_competitor_scarcity_or_surge_prices": true,
       "tunable_field": "target_net_vehicle_headroom_per_km",
       "hard_floor_must_be_preserved": true,
-      "benchmark_trip_distances_km": [2, 5, 10, 13, 20]
-    }
+      "benchmark_trip_distances_km": [
+        2,
+        5,
+        10,
+        13,
+        20
+      ]
+    },
+    "economic_floor": {
+      "definition": "representative_ICE_routine_cost_only_in_v1_2",
+      "formula": "R_floor_c = C_c / (1 - commission_rate)",
+      "headroom_is_part_of_floor": false
+    },
+    "published_distance_rate_formula": "R_c = round_up((C_c + H_c) / (1 - commission_rate), Rs_0.50)"
   },
   "minimum_fare": {
-    "minimum_passenger_trip_km": 2.0,
-    "included_initial_pickup_km": 2.0
+    "minimum_passenger_trip_km": 2,
+    "included_initial_pickup_km": 2
   },
   "pickup_search": {
-    "initial_radius_km": 2.0,
-    "expansion_increment_km": 2.0,
+    "initial_radius_km": 2,
+    "expansion_increment_km": 2,
     "charge_pickup_time": false,
     "pickup_time_policy_reason": "passenger already bears pre-trip waiting; pickup vehicle movement is compensated through distance",
     "bill_actual_authorized_pickup_distance": true,
@@ -112,7 +124,10 @@
     "driver_auto_bid": {
       "enabled": true,
       "manual_numeric_bidding_while_moving": false
-    }
+    },
+    "platform_default_ceiling": null,
+    "passenger_explicit_or_saved_ceiling_rule_required": true,
+    "no_platform_default_reason": "avoid anchoring passengers to a platform-selected premium"
   },
   "long_distance": {
     "enabled": true,
@@ -135,7 +150,10 @@
       "driver_net_earnings_and_utilization",
       "platform_sustainability_at_7_percent",
       "speeding_or_aggressive_driving_indicators",
-      "unexplained_excess_journey_time"
+      "unexplained_excess_journey_time",
+      "post_acceptance_driver_cancellation_rate",
+      "acceptance_to_driver_cancellation_time",
+      "passenger_rematch_or_abandonment_after_driver_cancellation"
     ]
   }
 }
