@@ -45,6 +45,14 @@ v1.2 is a simplification/governance revision. Core fare values are unchanged fro
 - Explicitly distinguishes Stage 3 as a final market-clearing opportunity rather than a guarantee of vehicle availability.
 - Reiterates that 7% commission sustainability, pickup acceptance, premium drift and reject-and-wait behavior remain empirical questions.
 
+### Independent-review clarifications
+
+- Defined the vehicle-distance economic floor explicitly as `R_floor_c = C_c / (1 - gamma)`.
+- Defined the published rate separately as `R_c = roundUp_0.50((C_c + H_c)/(1-gamma))`, making clear that competitive headroom `H_c` is **not** part of the floor.
+- Stated the billing increment explicitly: rates round upward to the next **Rs 0.50/km**.
+- Added **no platform-selected default fallback ceiling**; Stage 3 requires an explicit or saved passenger ceiling rule.
+- Added post-acceptance driver cancellation and multi-homing-related reliability metrics to monitoring.
+
 ### Literature
 
 - Restored paper-by-paper positioning in the v1.2 preprint.
