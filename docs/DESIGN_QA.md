@@ -95,3 +95,43 @@ A platform-selected default such as "+20%" could become an anchor for both passe
 v1.2 therefore provides **no default premium or default ceiling**. A passenger who wants Stage 3 must explicitly choose a private ceiling rule for that request or save one in advance. If no rule exists, fallback is not activated.
 
 This keeps the affordability decision with the passenger rather than allowing the platform to normalize a particular scarcity premium.
+
+
+## 13. What exactly does premium driver membership provide?
+
+Premium membership has exactly two reference benefits:
+
+1. advance demand-pattern forecasts; and
+2. priority access to scheduled-trip opportunities.
+
+It does not change ordinary live-trip pricing, commission, live dispatch priority, Stage 1 or Stage 2 treatment, or Stage 3 eligibility/clearing.
+
+Scheduled trips not accepted during the premium-priority window are automatically forwarded to eligible regular drivers. Premium therefore means earlier access to future scheduled work, not exclusive access.
+
+## 14. Why are high-profit long-distance scheduled trips rotated?
+
+A small number of drivers should not repeatedly capture the most profitable scheduled opportunities merely because they are fastest to respond or already have premium access.
+
+For qualifying high-value long-distance scheduled trips, a driver who completed a qualifying trip during the previous 7 days is temporarily deprioritized while another otherwise eligible driver without a recent qualifying trip is available.
+
+The intended order is:
+
+```text
+premium drivers without a recent qualifying trip
+    ->
+regular drivers without a recent qualifying trip
+    ->
+recently served eligible drivers
+```
+
+Within an equivalent pool, the least recently served driver receives earlier opportunity. If no other driver is available or accepts, the recent-trip restriction is relaxed.
+
+The qualifying distance/value threshold must be objective, published and auditable; v1.2 does not invent that threshold before deployment evidence exists.
+
+## 15. Why forecast demand instead of using price surge to reposition drivers?
+
+A demand forecast can help drivers plan where and when to work **before** a shortage appears, without changing passenger fares.
+
+Forecasts may use historical patterns and known signals such as weather, school times, public-transport arrivals and scheduled commitments. They should be presented probabilistically and, where practical, adjusted for expected available supply.
+
+This is a planning layer rather than a scarcity-price multiplier. Stage 3 remains the exceptional mechanism for actual requests that deterministic dispatch cannot clear.
