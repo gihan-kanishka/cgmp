@@ -33,6 +33,12 @@ It adds only the definitions needed to make the core reproducible:
 - commission treatment is explicit;
 - uncertain strategic/latency/premium issues remain monitoring and simulation questions.
 
+## Design Q&A appendix
+
+The v1.2 preprint includes **Appendix A: Frequently Raised Design Questions**, covering pickup-time policy, first-qualifying fallback, reject-and-wait behavior, congestion versus scarcity, competitive headroom, EV treatment, paid-minute versus online-hour earnings, fallback premium drift, Stage 3 availability limits, 7% commission sustainability, and the anti-over-engineering principle.
+
+The standalone repository version is available at `docs/DESIGN_QA.md`.
+
 ## Recommended publication path
 
 1. Run the focused v1.2 strategic simulation.
