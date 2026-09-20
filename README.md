@@ -203,7 +203,8 @@ These are estimates for comparison. Production fares use verified legitimate tri
 │   ├── CGMP-v1.1-preprint.md
 │   └── ZENODO_SUBMISSION.md
 └── whitepaper/
-    └── CGMP-v1.0-draft.md
+    ├── CGMP-v1.0-draft.md
+    └── CGMP-v1.1-draft.md
 ```
 
 ## Project attribution
