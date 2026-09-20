@@ -38,6 +38,13 @@ v1.2 is a simplification/governance revision. Core fare values are unchanged fro
 - These remain testable future controls only if evidence shows a material problem.
 - Expanded monitoring to include total request-to-match time, abandonment by stage, premium distributions, ceiling proximity and reject-then-fallback behavior.
 
+### Design Q&A
+
+- Added `docs/DESIGN_QA.md` and **Appendix A: Frequently Raised Design Questions** to the v1.2 preprint.
+- The Q&A explains recurring objections without introducing new pricing rules.
+- Explicitly distinguishes Stage 3 as a final market-clearing opportunity rather than a guarantee of vehicle availability.
+- Reiterates that 7% commission sustainability, pickup acceptance, premium drift and reject-and-wait behavior remain empirical questions.
+
 ### Literature
 
 - Restored paper-by-paper positioning in the v1.2 preprint.
