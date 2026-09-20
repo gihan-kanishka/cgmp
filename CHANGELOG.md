@@ -58,8 +58,9 @@ v1.2 is a simplification/governance revision. Core fare values are unchanged fro
 - Added optional premium-driver planning module with exactly two benefits: **advance demand-pattern forecasts** and **priority access to scheduled trips**.
 - Explicitly kept ordinary live-trip fares, commission, dispatch priority and Stage 3 treatment identical for premium and regular drivers.
 - Scheduled trips unclaimed during the premium-priority window are automatically forwarded to regular drivers.
-- Added a **7-day fairness rotation** for qualifying high-value long-distance scheduled trips.
-- Drivers with no qualifying long-distance trip in the previous 7 days receive priority over recently served drivers; recently served drivers remain available as a fulfilment fallback.
+- Added a configurable fairness rotation `L_fair` for qualifying high-value long-distance scheduled trips, with **7 days as the v1.2 reference default rather than a fixed rule**.
+- Drivers with no qualifying long-distance trip in the configured lookback receive priority over recently served drivers; recently served drivers remain available as a fulfilment fallback.
+- Required the effective fairness lookback to be published/versioned and added lookback sensitivity to validation.
 - Added least-recently-served ordering within equivalent candidate pools.
 - Added supply-aware forecast guidance and scheduled-commitment accounting as optional planning features.
 - Added validation metrics for forecast accuracy, herding, scheduled-trip fill, allocation concentration and fairness overrides.
