@@ -10,8 +10,8 @@ CGMP is intended as a transparent alternative to opaque, continuously supply-dem
 
 ## Status
 
-**Version:** v1.0-draft  
-**Stage:** design and simulation  
+**Version:** v1.0-preprint  
+**Stage:** design preprint; simulation and live-pilot validation pending  
 **Evidence status:** not yet validated by a live controlled pilot
 
 The numerical values in this repository are working assumptions for modelling. They are not claims that the listed values are universally correct. A production deployment should recalibrate them using local fleet, maintenance, energy, demand and trip data.
@@ -169,6 +169,12 @@ This is a **testable hypothesis**, not a proven safety outcome. A pilot should m
 └── whitepaper/
     └── CGMP-v1.0-draft.md
 ```
+
+## Preprint
+
+A publication-oriented design preprint with literature review and references is available in [preprint/CGMP-v1.0-preprint.md](preprint/CGMP-v1.0-preprint.md).
+
+The accompanying [Zenodo submission metadata](preprint/ZENODO_SUBMISSION.md) is prepared for a Publication / Preprint deposit.
 
 ## Licensing
 
