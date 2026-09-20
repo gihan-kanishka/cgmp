@@ -1,92 +1,62 @@
-# Abuse and Integrity Controls - v1.1
+# Integrity and Monitoring Controls - v1.2
 
-CGMP is designed to be manipulation-resistant, not manipulation-proof.
+CGMP v1.2 prefers measurement over speculative rule accumulation.
 
-## Fare-critical data
+## Server-authoritative inputs
 
-Where feasible, the server should validate or calculate:
+Where practical, the platform should validate:
 
-- legal/reasonable route geometry;
-- pickup distance and search band;
-- passenger-trip distance;
-- passenger-trip timestamps;
-- vehicle movement plausibility;
+- pickup route and distance;
+- passenger-trip route and distance;
+- passenger-trip start/end timestamps;
+- trip state;
 - vehicle class;
-- long-distance eligibility;
-- passenger authorization state;
-- deterministic-search state;
-- fallback activation state;
-- authoritative fallback offer receipt/order.
+- search stage and passenger authorization;
+- long-distance provision;
+- fallback eligibility;
+- fallback offer order.
 
-Client telemetry is evidence, not sole authority.
+## Trip-time integrity
 
-## Time manipulation
+The time charge applies only to the passenger-trip interval.
 
-The current fare explicitly compensates legitimate passenger-trip time.
+Potential anomalies such as unexplained stops, route stretching, repeated excessive duration or impossible timestamps should be flagged for review.
 
-A single slow trip is not evidence of abuse. Review should focus on repeated patterns such as:
+A single unusual trip is not sufficient evidence of manipulation.
 
-- materially longer times than comparable trips;
-- unnecessary detours;
-- repeated supported passenger reports;
-- unexplained divergence from reasonable route/time distributions.
+## Search integrity
 
-The same system should detect repeated speeding/aggressive-driving patterns.
+Record each search stage and authorization so total matching delay can be measured from **initial request creation**, not only from fallback activation.
 
-## Passenger complaint integrity
+## Strategic rejection
 
-Passenger reports should trigger review rather than automatic guilt.
+v1.2 does not automatically bar a driver who rejected the deterministic request from later fallback participation.
 
-Chronic unsupported complaint patterns may themselves be flagged for verification.
+Instead, measure:
 
-> Reports establish patterns; objective trip data validates them.
+- deterministic rejection;
+- later participation on the same request;
+- repeated reject-then-premium patterns;
+- area/time clustering.
 
-## Search and pickup integrity
+A same-request exclusion rule may be tested later if evidence shows material gaming.
 
-The platform should log:
+## First-qualifying latency
 
-- initial 0-2 km search;
-- each 2 km expansion authorization;
-- actual pickup distance;
-- charged pickup distance;
-- whether the authorization was interactive or a saved preference.
+Use an authoritative server ordering rule and measure the relationship between network/device latency and fallback wins.
 
-Search-band boundaries must never be used as billing distance when actual pickup is lower.
+No latency correction is part of the v1.2 reference mechanism unless evidence shows material bias.
 
-## Strategic rejection and fallback
+## Competitive-calibration integrity
 
-Monitor:
+Competitive headroom changes must be:
 
-- deterministic-offer rejection rates;
-- fallback activation rate;
-- repeated rejection immediately followed by fallback participation;
-- synchronized rejection/offer behavior;
-- unusual account/device relationships;
-- regional/time-of-day clusters.
+- scheduled rather than real-time;
+- based on standardized ordinary/non-scarcity competitor observations;
+- versioned;
+- auditable;
+- constrained by the economic floor.
 
-The existence of competitive alternatives and viable deterministic fares may limit gaming, but this should be measured rather than assumed.
+## Publication principle
 
-If material reject-and-wait behavior appears, the implementation may lock a rejecting driver out of premium bidding on the same request.
-
-## First-qualifying integrity
-
-Because the first qualifying sealed offer clears the trip, authoritative ordering is allocation-critical.
-
-The platform should:
-
-- use server-authoritative receipt/order;
-- monitor abnormal latency advantages;
-- retain sufficient event data for audit;
-- publish or document the ordering policy.
-
-## Calibration integrity
-
-Competitive tuning may adjust only declared competitive variables.
-
-It must not silently push the fare below the economic floor or alter the labour target, commission, minimum-distance rule or scarcity mechanism.
-
-Parameter changes should be versioned and auditable.
-
-## Long-distance claims
-
-Long-distance provisions are rule-derived and accepted before the trip. They are not discretionary after-the-fact driver claims.
+Adverse findings should be retained and reported. Monitoring is useful only if the project is willing to change the design when evidence contradicts its assumptions.
