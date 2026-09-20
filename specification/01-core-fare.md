@@ -94,19 +94,33 @@ Current target net vehicle headroom after commission:
 | Compact | Rs 15 |
 | Sedan | Rs 21 |
 
-Passenger distance rate is calibrated from:
+Let:
+
+- `C_c` = representative ICE routine economic cost/km for class `c`;
+- `H_c` = non-negative competitive headroom/km;
+- `gamma` = platform commission rate.
+
+The **vehicle-distance economic floor** is:
 
 ```text
-(routine ICE cost/km + target net vehicle headroom/km)
-/
-(1 - commission)
+R_floor_c = C_c / (1 - gamma)
 ```
 
-and rounded upward to the published billing increment.
+The published passenger distance rate is:
+
+```text
+R_c = roundUp_0.50(
+        (C_c + H_c) / (1 - gamma)
+      )
+```
+
+where `roundUp_0.50` means round upward to the next **Rs 0.50/km** billing increment.
+
+Therefore, **headroom is not part of the economic floor**. It is the competitive margin above the floor.
 
 Headroom may be recalibrated against competitor fares, but only through a scheduled periodic review using standardized ordinary/non-scarcity observations.
 
-It must not be adjusted continuously with demand and must not cross the economic floor.
+It must not be adjusted continuously with demand, must remain non-negative, and must not push the published rate below `R_floor_c`.
 
 ## 6. Labour rate
 
