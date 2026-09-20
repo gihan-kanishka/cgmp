@@ -4,16 +4,18 @@ title: "Cost-Grounded Mobility Pricing (CGMP)"
 type: software
 authors:
   - name: "CGMP Project"
-version: "1.1-preprint"
+version: "1.2-preprint"
 date-released: "2026-09-20"
 repository-code: "https://github.com/gihan-kanishka/cgmp"
 url: "https://github.com/gihan-kanishka/cgmp"
 license: "Apache-2.0"
 abstract: >-
   An open ride-hailing fare and dispatch framework with representative
-  ICE-based fare calibration, explicit driver-time compensation,
+  ICE-based fare calibration, explicit passenger-trip time compensation,
   passenger-controlled progressive pickup search, and exceptional
   first-qualifying sealed dispatch after deterministic expanded search fails.
+  v1.2 deliberately keeps uncertain behavioral issues in monitoring rather
+  than adding preemptive pricing and dispatch rules.
 keywords:
   - ride-hailing
   - mobility pricing
