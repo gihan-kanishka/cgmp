@@ -196,6 +196,15 @@
           "premium_not_served_with_qualifying_trip_in_previous_7_days",
           "regular_not_served_with_qualifying_trip_in_previous_7_days",
           "recently_served_eligible_drivers"
+        ],
+        "lookback_configurable": true,
+        "lookback_parameter_name": "L_fair",
+        "lookback_governance": "published_and_versioned_deployment_parameter",
+        "lookback_recalibration_basis": [
+          "allocation_concentration",
+          "qualifying_trip_frequency",
+          "driver_availability",
+          "passenger_fulfilment"
         ]
       }
     }
