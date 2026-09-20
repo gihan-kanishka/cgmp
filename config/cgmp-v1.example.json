@@ -1,220 +1,63 @@
 {
-  "version": "1.2-preprint",
+  "version": "1.4-preprint",
   "currency": "LKR",
-  "platform_commission": {
-    "rate": 0.07,
-    "commissionable_components": [
-      "distance_charge",
-      "passenger_trip_time_charge",
-      "fallback_premium"
-    ],
-    "commission_exempt_pass_throughs": [
-      "actual_tolls",
-      "explicitly_reimbursed_accommodation_or_similar_third_party_costs"
-    ]
+  "platform_commission_rate": 0.07,
+  "passenger_time_rate_per_min": 12.9,
+  "minimum_passenger_trip_km": 2,
+  "minimum_pickup_component_km": 2,
+  "pickup_search_increment_km": 2,
+  "pickup_time_charged": false,
+  "upfront_final_fare_estimate": false,
+  "demand_supply_surge_multiplier": false,
+  "driver_bidding": false,
+  "classes": {
+    "bike": {"routine_ICE_cost_per_km": 10.0, "passenger_distance_rate_per_km": 22.0},
+    "tuk": {"routine_ICE_cost_per_km": 22.1, "passenger_distance_rate_per_km": 37.0},
+    "mini": {"routine_ICE_cost_per_km": 32.8, "passenger_distance_rate_per_km": 52.0},
+    "compact": {"routine_ICE_cost_per_km": 34.0, "passenger_distance_rate_per_km": 57.0},
+    "sedan": {"routine_ICE_cost_per_km": 36.1, "passenger_distance_rate_per_km": 65.0}
   },
-  "calibration": {
-    "tariff_basis": "representative_ICE_class_economics",
-    "ignore_EV_costs_for_tariff_setting": true,
-    "rate_rounding_increment": 0.5,
-    "target_net_driver_labour_per_min": 12,
-    "passenger_time_rate_per_min": 12.9,
-    "reference_speed_kmph_for_examples": 25,
-    "routine_ICE_cost_formula_components": [
-      "fuel_cost_per_km",
-      "tyres_per_km",
-      "scheduled_service_per_km",
-      "brakes_suspension_repairs_per_km",
-      "other_defined_routine_wear_per_km"
-    ],
-    "component_breakdown_status": "required_before_production; current aggregate class costs are provisional modelling assumptions",
-    "classes": {
-      "bike": {
-        "routine_ICE_cost_per_km": 10.5,
-        "target_net_vehicle_headroom_per_km": 3,
-        "passenger_distance_rate_per_km": 15,
-        "provisional_calibration_basis": {
-          "benchmark_vehicle": "economical_100_125cc_commuter_motorcycle",
-          "petrol_92_price_per_litre": 399,
-          "assumed_loaded_urban_fuel_economy_km_per_litre": 60,
-          "fuel_cost_per_km": 6.65,
-          "pooled_nonfuel_routine_wear_reserve_per_km": 3.85,
-          "status": "provisional; nonfuel reserve requires dated fleet validation"
-        }
-      },
-      "tuk": {
-        "routine_ICE_cost_per_km": 22.1,
-        "target_net_vehicle_headroom_per_km": 12,
-        "passenger_distance_rate_per_km": 37
-      },
-      "mini": {
-        "routine_ICE_cost_per_km": 32.8,
-        "target_net_vehicle_headroom_per_km": 15,
-        "passenger_distance_rate_per_km": 51.5
-      },
-      "compact": {
-        "routine_ICE_cost_per_km": 34,
-        "target_net_vehicle_headroom_per_km": 15,
-        "passenger_distance_rate_per_km": 53
-      },
-      "sedan": {
-        "routine_ICE_cost_per_km": 36.1,
-        "target_net_vehicle_headroom_per_km": 21,
-        "passenger_distance_rate_per_km": 61.5
-      }
-    },
-    "competitive_tuning": {
-      "enabled": true,
-      "mode": "scheduled_periodic_review",
-      "real_time_adjustment": false,
-      "exclude_competitor_scarcity_or_surge_prices": true,
-      "tunable_field": "target_net_vehicle_headroom_per_km",
-      "hard_floor_must_be_preserved": true,
-      "benchmark_trip_distances_km": [
-        2,
-        5,
-        10,
-        13,
-        20
-      ]
-    },
-    "economic_floor": {
-      "definition": "representative_ICE_routine_cost_only_in_v1_2",
-      "formula": "R_floor_c = C_c / (1 - commission_rate)",
-      "headroom_is_part_of_floor": false
-    },
-    "published_distance_rate_formula": "R_c = round_up((C_c + H_c) / (1 - commission_rate), Rs_0.50)"
+  "efficiency_policy": {
+    "tariff_basis": "representative_vehicle_class",
+    "individual_efficiency_savings_belong_to_driver": true
   },
-  "minimum_fare": {
-    "minimum_passenger_trip_km": 2,
-    "included_initial_pickup_km": 2
+  "cancellation": {
+    "passenger_cancellation_after_pickup_travel": "debit_validated_pickup_component_and_credit_driver",
+    "driver_fault_cancellation": "no_passenger_pickup_charge_for_driver_fault",
+    "grace_rule": "published_deployment_parameter",
+    "no_show_rule": "published_deployment_parameter"
   },
-  "pickup_search": {
-    "initial_radius_km": 2,
-    "expansion_increment_km": 2,
-    "charge_pickup_time": false,
-    "pickup_time_policy_reason": "passenger already bears pre-trip waiting; pickup vehicle movement is compensated through distance",
-    "bill_actual_authorized_pickup_distance": true,
-    "passenger_standing_authorization": {
-      "enabled": true,
-      "max_pickup_distance_km": null,
-      "max_pickup_cost": null,
-      "max_auto_search_radius_km": null
-    }
-  },
-  "trip_time": {
-    "billable_interval": "passenger_trip_start_to_passenger_trip_end",
-    "pickup_time_excluded": true,
-    "server_validation_required": true,
-    "upfront_display": "estimate",
-    "reference_final_fare_basis": "verified_actual_passenger_trip_time",
-    "implausible_or_disputed_intervals": "flag_for_review"
-  },
-  "sealed_bidding": {
-    "enabled": true,
-    "activation_rule": "only_after_authorized_deterministic_expanded_search_fails",
-    "baseline_definition": "driver_specific_gross_passenger_fare_F0_i",
-    "passenger_ceiling_definition": "private_rule_applied_to_F0_i_to_produce_M_i",
-    "bid_definition": "gross_passenger_facing_total_fare_b_i",
-    "passenger_max_hidden": true,
-    "driver_bids_hidden": true,
-    "selection_rule": "first_qualifying_bid",
-    "qualifying_rule": "F0_i <= b_i <= M_i",
-    "clear_immediately": true,
-    "authoritative_order": "server_receipt_order",
-    "passenger_ceiling_modes": [
-      "percentage_above_base",
-      "fixed_amount_per_trip_km_above_base",
-      "fixed_fee_by_trip_distance_band"
-    ],
-    "preemptive_rejecter_ban": false,
-    "preemptive_premium_cap": false,
-    "driver_auto_bid": {
-      "enabled": true,
-      "manual_numeric_bidding_while_moving": false
-    },
-    "platform_default_ceiling": null,
-    "passenger_explicit_or_saved_ceiling_rule_required": true,
-    "no_platform_default_reason": "avoid anchoring passengers to a platform-selected premium"
+  "personal_stop": {
+    "driver_must_pause_time_billing": true,
+    "notify_driver_and_passenger": true,
+    "exclude_clear_personal_detour_distance_on_reconciliation": true
   },
   "long_distance": {
+    "threshold_passenger_km": 40,
+    "accrual": "progressive_marginal_by_km",
+    "live_amount_status": "provisional",
+    "end_of_trip_reconciliation": true,
+    "ordinary_meter_never_clawed_back": true,
+    "one_day_displacement_principle": true,
+    "return_direction_measurement_hours": [6, 12, 24],
+    "band_schedule_status": "calibration_required_before_charging",
+    "bands": []
+  },
+  "cash_commission_ledger": {
     "enabled": true,
-    "requires_pretrip_passenger_consent": true,
-    "automatic_lost_wage_compensation": false,
-    "automatic_full_empty_return_compensation": false
+    "settlement_threshold": "published_deployment_parameter",
+    "cash_trip_restriction_at_threshold": true,
+    "electronic_trips_may_reduce_debt": true
   },
   "monitoring": {
-    "measure_before_adding_corrective_rules": true,
-    "metrics": [
-      "deterministic_acceptance_and_rejection",
-      "acceptance_by_pickup_distance_band",
-      "total_request_to_match_time",
-      "passenger_abandonment_by_stage",
-      "fallback_activation_rate",
-      "fallback_premium_distribution",
-      "clearing_offer_proximity_to_passenger_ceiling",
-      "reject_then_fallback_participation",
-      "network_latency_vs_fallback_win_rate",
-      "driver_net_earnings_and_utilization",
-      "platform_sustainability_at_7_percent",
-      "speeding_or_aggressive_driving_indicators",
-      "unexplained_excess_journey_time",
-      "post_acceptance_driver_cancellation_rate",
-      "acceptance_to_driver_cancellation_time",
-      "passenger_rematch_or_abandonment_after_driver_cancellation"
-    ]
-  },
-  "premium_driver_planning": {
-    "enabled": true,
-    "benefits": [
-      "advance_demand_pattern_forecasts",
-      "priority_access_to_scheduled_trips"
-    ],
-    "ordinary_live_dispatch_priority_changed": false,
-    "live_trip_fares_changed": false,
-    "commission_changed": false,
-    "stage_3_treatment_changed": false,
-    "demand_forecasts": {
-      "day_prior_supported": true,
-      "probabilistic_not_guaranteed": true,
-      "supply_aware_where_practical": true,
-      "possible_inputs": [
-        "historical_trip_patterns",
-        "weather_forecasts",
-        "school_times",
-        "scheduled_train_or_public_transport_arrivals",
-        "major_events",
-        "expected_driver_availability",
-        "scheduled_trip_commitments"
-      ]
-    },
-    "scheduled_trips": {
-      "premium_priority_access": true,
-      "premium_priority_window": "published_implementation_parameter",
-      "unclaimed_forward_to_regular_drivers": true,
-      "priority_must_not_jeopardize_on_time_assignment": true,
-      "high_value_long_distance_fairness": {
-        "enabled": true,
-        "qualifying_threshold": "published_deployment_parameter",
-        "lookback_days": 7,
-        "recently_served_deprioritized": true,
-        "least_recently_served_first_within_equivalent_pool": true,
-        "availability_override": true,
-        "access_sequence": [
-          "premium_not_served_with_qualifying_trip_in_previous_7_days",
-          "regular_not_served_with_qualifying_trip_in_previous_7_days",
-          "recently_served_eligible_drivers"
-        ],
-        "lookback_configurable": true,
-        "lookback_parameter_name": "L_fair",
-        "lookback_governance": "published_and_versioned_deployment_parameter",
-        "lookback_recalibration_basis": [
-          "allocation_concentration",
-          "qualifying_trip_frequency",
-          "driver_availability",
-          "passenger_fulfilment"
-        ]
-      }
-    }
+    "pickup_acceptance_by_distance_and_time": true,
+    "cancellation_pickup_compensation": true,
+    "personal_stop_pauses": true,
+    "meter_farming_patterns": true,
+    "cash_ledger_threshold_hits": true,
+    "long_distance_provisional_vs_final": true,
+    "return_direction_matches_6_12_24h": true,
+    "trip_continuation_splitting": true,
+    "platform_sustainability_at_7_percent": true
   }
 }
