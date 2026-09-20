@@ -46,7 +46,10 @@ Suggested distances:
 - total request-to-match time;
 - time spent in each stage;
 - passenger abandonment/cancellation by stage;
-- actual pickup-distance distribution.
+- actual pickup-distance distribution;
+- post-acceptance driver cancellation rate;
+- time from driver acceptance to driver cancellation;
+- passenger rematch/abandonment after driver cancellation.
 
 ### Fallback
 
