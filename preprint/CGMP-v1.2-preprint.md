@@ -297,16 +297,16 @@ Premium access is therefore priority access rather than exclusivity. The priorit
 
 ### 10.3 Fair rotation of high-value long-distance scheduled trips
 
-Qualifying high-value long-distance scheduled trips use a 7-day fairness rotation.
+Qualifying high-value long-distance scheduled trips use a configurable fairness lookback `L_fair`. The v1.2 reference default is **7 days**, but the deployed value must be published and may be recalibrated from observed allocation concentration, qualifying-trip frequency, driver availability and passenger fulfilment.
 
-A driver who completed a qualifying trip during the previous 7 days is deprioritized while another otherwise eligible driver without a recent qualifying trip is available.
+A driver who completed a qualifying trip during the previous `L_fair` days is deprioritized while another otherwise eligible driver without a recent qualifying trip is available.
 
 The intended opportunity sequence is:
 
 ```text
-premium drivers without a qualifying trip in the previous 7 days
+premium drivers without a qualifying trip in the previous L_fair days
     ->
-regular drivers without a qualifying trip in the previous 7 days
+regular drivers without a qualifying trip in the previous L_fair days
     ->
 recently served eligible drivers
 ```
@@ -315,7 +315,7 @@ Within an equivalent pool, the driver least recently served by a qualifying trip
 
 If no non-recent driver is available or accepts, the recent-trip restriction is relaxed so passenger fulfilment is not sacrificed.
 
-A production deployment must publish an objective and auditable definition of a qualifying high-value long-distance scheduled trip. v1.2 does not invent that distance/fare threshold before deployment evidence exists.
+A production deployment must publish an objective and auditable definition of a qualifying high-value long-distance scheduled trip and the current effective `L_fair` value. v1.2 does not invent the distance/fare threshold before deployment evidence exists, and 7 days is a reference default rather than a permanent rule.
 
 Scheduled commitments should also be deducted from predicted future available capacity so the forecast does not count already committed drivers as freely available supply.
 
@@ -503,7 +503,9 @@ Scheduled trips not accepted during the premium-priority window are automaticall
 
 A small number of drivers should not repeatedly capture the most profitable scheduled opportunities merely because they respond fastest or already hold premium membership.
 
-For qualifying high-value long-distance scheduled trips, a driver who completed a qualifying trip during the previous 7 days is temporarily deprioritized while another otherwise eligible driver without a recent qualifying trip is available.
+For qualifying high-value long-distance scheduled trips, a configurable lookback `L_fair` is used. The v1.2 reference default is 7 days, but the deployed value is published and can be recalibrated from observed trip frequency, allocation concentration and availability.
+
+A driver who completed a qualifying trip during the previous `L_fair` days is temporarily deprioritized while another otherwise eligible driver without a recent qualifying trip is available.
 
 The intended order is:
 
@@ -517,7 +519,7 @@ recently served eligible drivers
 
 Within an equivalent pool, the least recently served driver receives earlier opportunity. If no other driver is available or accepts, the recent-trip restriction is relaxed.
 
-The qualifying threshold must be objective, published and auditable.
+The qualifying threshold and effective `L_fair` value must be objective, published and auditable. The 7-day value is only the v1.2 reference default.
 
 ### A.15 Why forecast demand instead of using passenger-price surge to reposition drivers?
 
