@@ -2,7 +2,16 @@
 
 ## v1.2-preprint — 2026-09-20
 
-v1.2 is a simplification/governance revision. Core fare values are unchanged from v1.1.
+v1.2 is a simplification/governance revision with one calibration correction: the Bike class was recalibrated after reviewing commuter-motorcycle fuel efficiency.
+
+### Bike calibration correction
+
+- Reduced provisional Bike routine ICE cost from **Rs 14.50/km to Rs 10.50/km**.
+- Recalibrated Bike passenger distance rate from **Rs 19.00/km to Rs 15.00/km** while retaining the Rs 3/km target net vehicle headroom and 7% commission.
+- Used Rs 399/litre Petrol 92 and a deliberately conservative 60 km/l working efficiency, implying **Rs 6.65/km fuel cost**.
+- Added a provisional **Rs 3.85/km pooled non-fuel routine-wear reserve**, explicitly requiring fleet validation before production.
+- Updated the 25 km/h Bike effective trip rate to **Rs 45.96/km** before pickup allocation.
+- Updated the 13 km + 2 km pickup example at 25 km/h from Rs 687.48 to **Rs 627.48**.
 
 ### Clarified core policy
 
