@@ -14,9 +14,6 @@
 
 **Creator type:** Organization / project
 
-**ORCID:** [OPTIONAL - ADD IF AVAILABLE]
-
-**Affiliation:** Independent researcher (or replace with your preferred affiliation)
 
 **License:** Creative Commons Attribution 4.0 International (CC BY 4.0)
 
