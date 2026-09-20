@@ -1,145 +1,177 @@
 # Cost-Grounded Mobility Pricing (CGMP)
 
-**CGMP** is an open framework for ride-hailing fare design.
+**CGMP** is an open framework for transparent ride-hailing fare calibration and exceptional dispatch.
 
-Its central idea is simple:
-
-> Price ordinary transport from measurable vehicle use and driver time; use competitive price discovery only when the ordinary price cannot clear the market.
-
-CGMP is intended as a transparent alternative to opaque, continuously supply-demand-driven surge pricing. It separates the normal fare from the exceptional market-clearing mechanism.
+> Costs set the economic floor; competition may tune the margin above that floor; scarcity pricing is reserved for trips that fail deterministic dispatch.
 
 ## Status
 
-**Version:** v1.0-preprint  
+**Version:** v1.1-preprint  
+**Date:** 2026-09-20  
 **Stage:** design preprint; simulation and live-pilot validation pending  
 **Evidence status:** not yet validated by a live controlled pilot
 
-The numerical values in this repository are working assumptions for modelling. They are not claims that the listed values are universally correct. A production deployment should recalibrate them using local fleet, maintenance, energy, demand and trip data.
+All numerical values below are current modelling assumptions. Production deployment requires local fleet, platform-cost, trip and competitor-fare data.
 
-## Core architecture
+## Current reference calibration
 
-A normal trip is priced using published inputs:
+Passenger-facing rates are grossed up for a **7% platform commission**.
+
+| Class | Representative ICE routine cost/km | Current target net vehicle headroom/km | Passenger distance rate |
+|---|---:|---:|---:|
+| Bike | Rs 14.50 | Rs 3 | **Rs 19.00/km** |
+| Tuk | Rs 22.10 | Rs 12 | **Rs 37.00/km** |
+| Mini | Rs 32.80 | Rs 15 | **Rs 51.50/km** |
+| Compact | Rs 34.00 | Rs 15 | **Rs 53.00/km** |
+| Sedan | Rs 36.10 | Rs 21 | **Rs 61.50/km** |
+
+Passenger time rate: **Rs 12.90/minute**, yielding approximately **Rs 12.00/minute net to the driver after 7% commission**.
+
+The current class headrooms are competitive calibration targets, not immutable constants. They may be adjusted against observed competitor passenger fares, but the underlying economic floor must not be crossed.
+
+## Calibration rule
+
+For vehicle class `c`:
 
 ```text
-normal fare =
-    pickup distance charge
-  + passenger-trip distance charge
-  + passenger-trip time charge
-  + pre-agreed necessary long-distance displacement provision
+passenger_distance_rate_c =
+    (representative_ICE_routine_cost_c + target_net_vehicle_headroom_c)
+    / (1 - commission_rate)
 ```
 
-CGMP v1.0-draft uses the following Sri Lanka-oriented modelling parameters:
+The published rate may be rounded upward to a transparent billing increment.
 
-| Vehicle class | Distance rate |
+For labour:
+
+```text
+passenger_time_rate =
+    target_net_driver_labour_per_minute / (1 - commission_rate)
+```
+
+Current labour target: **Rs 12 net/minute**.
+
+EVs and unusually efficient vehicles do **not** set the passenger tariff. CGMP calibrates the class rate from representative ICE economics; owners of more efficient vehicles retain their efficiency advantage.
+
+## Minimum fare and pickup
+
+The current reference policy is:
+
+- minimum passenger-trip distance charged: **2 km**;
+- initial pickup/search allowance: **2 km**;
+- pickup time: **not charged**;
+- search expansion: **2 km increments**;
+- pickup beyond 2 km: charged at the **actual authorized pickup distance**, not the full search-band ceiling.
+
+The ordinary fare is:
+
+```text
+F =
+  [max(passenger_trip_km, 2) + max(actual_pickup_km, 2)] * class_rate
+  + verified_passenger_trip_minutes * 12.90
+  + pre-agreed_long_distance_provision
+```
+
+For a very short trip, the minimum distance component therefore represents **2 km passenger travel + 2 km pickup**.
+
+## Dispatch architecture
+
+### Stage 1 - normal nearby search
+
+Search eligible drivers within **0-2 km** at the deterministic CGMP fare. No additional passenger confirmation is required for the included pickup band.
+
+### Stage 2 - passenger-authorized expanded search
+
+If no match is obtained, expand in **2 km increments**:
+
+```text
+0-2 km -> 2-4 km -> 4-6 km -> 6-8 km -> ...
+```
+
+The passenger can approve each expansion with one click or save standing preferences such as:
+
+- automatically expand up to a chosen radius;
+- maximum pickup cost;
+- maximum pickup distance.
+
+Expanded pickup is still deterministic CGMP pricing. **No bidding occurs merely because the search radius expanded.**
+
+### Stage 3 - exceptional sealed dispatch
+
+Sealed bidding is enabled only after the passenger-authorized deterministic expanded-search process fails to obtain a vehicle.
+
+The passenger can define a private maximum willingness-to-pay allowance using:
+
+- a percentage above the deterministic base fare;
+- a fixed additional amount per passenger-trip kilometre;
+- a fixed additional fee by trip-distance band.
+
+The platform does not expose this ceiling to drivers.
+
+Drivers configure private automatic fallback rules while parked. The first server-valid qualifying offer inside the passenger ceiling clears immediately.
+
+```text
+baseline <= first qualifying offer <= passenger ceiling
+```
+
+The fallback is intended to be exceptional. A high fallback-activation rate is a signal to investigate fare calibration, supply conditions or strategic rejection.
+
+## Competitive calibration and the hard floor
+
+CGMP may compare standardized benchmark trips with competitor platforms and tune the **vehicle headroom** to keep passenger fares commercially attractive.
+
+Competition is not allowed to push the tariff below the economic floor:
+
+```text
+actual published rate =
+    max(economic-floor rate, competitively calibrated rate)
+```
+
+The hard floor protects:
+
+- representative ICE routine operating cost;
+- the published net driver-labour target;
+- the transparent commission required by the platform.
+
+The current 7% commission is a working business parameter and should be validated against payments, maps, support, fraud, communications, engineering, compliance and dispute-resolution costs.
+
+## Reference examples
+
+At the **25 km/h reference speed**, Rs 12.90/min is equivalent to **Rs 30.96 per passenger-trip km** of time compensation.
+
+Effective passenger-trip rate at that reference speed, before pickup:
+
+| Class | Distance component/km | Time equivalent/km | Effective trip rate/km |
+|---|---:|---:|---:|
+| Bike | Rs 19.00 | Rs 30.96 | **Rs 49.96** |
+| Tuk | Rs 37.00 | Rs 30.96 | **Rs 67.96** |
+| Mini | Rs 51.50 | Rs 30.96 | **Rs 82.46** |
+| Compact | Rs 53.00 | Rs 30.96 | **Rs 83.96** |
+| Sedan | Rs 61.50 | Rs 30.96 | **Rs 92.46** |
+
+A **13 km trip + 2 km pickup** at the same 25 km/h reference trip speed (31.2 passenger minutes) gives:
+
+| Class | Estimated passenger fare |
 |---|---:|
-| Bike | Rs 30/km |
-| Tuk | Rs 40/km |
-| Mini | Rs 50/km |
-| Compact | Rs 52.50/km |
-| Sedan | Rs 55/km |
+| Bike | **Rs 687.48** |
+| Tuk | **Rs 957.48** |
+| Mini | **Rs 1,174.98** |
+| Compact | **Rs 1,197.48** |
+| Sedan | **Rs 1,324.98** |
 
-Common passenger-trip time rate: **Rs 12/minute**  
-Illustrative platform commission: **7%**
-
-These are configurable parameters, not immutable parts of the framework.
+These are estimates for comparison. Production fares use verified legitimate trip time.
 
 ## Design principles
 
-1. **Distance pays for the vehicle and its risks; time pays for the human.**
-2. **Ordinary fares are cost-grounded, not automatically surge-multiplied by scarcity.**
-3. **Traffic can increase a fare because it consumes more driver time, and the app should explain that cause explicitly.**
-4. **Pickup distance is paid at the vehicle-class distance rate.**
-5. **Passengers can pre-authorize pickup distance/cost limits; requests outside those saved limits require explicit approval before dispatch.**
-6. **Exceptional long-distance displacement charges are calculated and shown before the trip is accepted.**
-7. **Efficient vehicles retain their efficiency advantage.** Passenger tariffs are based on service class rather than individual powertrain.
-8. **When the published baseline does not attract a driver, the system uses a sealed fallback rather than an automatic surge multiplier.**
-9. **The passenger's maximum price is private. Driver offers are private. The first valid offer within the passenger's ceiling clears the trip immediately.**
-10. **Drivers can configure automatic private bidding rules while parked, avoiding manual numerical bidding while driving.**
-11. **Fare-critical route, time and distance data should be computed or validated server-side.**
-
-## Fast market-clearing fallback
-
-Normal dispatch happens first at the published baseline.
-
-If no driver accepts:
-
-1. the passenger may use a saved private maximum total fare or set one for that request;
-2. eligible driver apps evaluate the request using private, preconfigured bidding rules;
-3. driver rules may consider pickup ETA, pickup distance, trip distance, expected trip duration, road/terrain conditions, destination, time of day and the driver's own minimum acceptable economics;
-4. drivers do not see the passenger maximum;
-5. drivers do not see competing offers;
-6. the first server-valid offer satisfying `baseline <= bid <= passenger maximum` immediately clears the trip;
-7. if no offer qualifies, no match occurs unless the passenger voluntarily changes the ceiling.
-
-The objective is **fast market clearing within a passenger-chosen affordability limit**, not waiting for an auction window to find the mathematically lowest offer.
-
-To reduce dispatch bias, an implementation should send a fallback request to the relevant candidate group at effectively the same dispatch epoch and use authoritative server receipt/order rules.
-
-## Automated preferences
-
-### Driver side
-
-Drivers should be able to configure private bidding preferences during signup or while parked. The app can then submit qualifying fallback offers automatically without requiring the driver to type a price while operating the vehicle.
-
-A production implementation should not require manual numerical bidding from a moving driver.
-
-### Passenger side
-
-Passengers should be able to configure standing pickup authorization using variables such as:
-
-- maximum pickup distance;
-- maximum pickup cost.
-
-For example, a passenger may authorize pickup automatically when both the distance and cost are within their saved limits. The app should still disclose the actual pickup distance and charge.
-
-The same principle can be used for a saved private fallback ceiling if the passenger chooses to enable it.
-
-## Pickup policy
-
-Pickup distance is charged at the normal class Rs/km rate.
-
-In the v1.0-draft policy:
-
-- a default pickup consent threshold may be configured by the deployment;
-- the reference modelling threshold is **2 km**;
-- passengers may set their own standing auto-approval limits based on pickup distance and/or pickup cost;
-- if the requested pickup falls within those saved limits, separate interaction is unnecessary;
-- if it falls outside the saved limits, explicit passenger approval is required before dispatch;
-- pickup time is not separately charged;
-- route distance should be determined from a reasonable server-calculated route and frozen at dispatch/acceptance according to implementation policy.
-
-Standing preferences are intended to preserve informed consent without adding a confirmation screen to every qualifying request.
-
-## Long-distance policy
-
-CGMP does not guarantee a driver a profitable round trip.
-
-The baseline should compensate the outbound trip fairly. Where the trip creates unavoidable displacement—such as a destination/time combination that makes an immediate safe return unreasonable—a pre-trip provision may cover necessary accommodation, meals, tolls or other defined displacement costs.
-
-The passenger must see and agree to the rule-derived amount before the trip, either directly or through an applicable pre-authorized rule.
-
-CGMP does **not** automatically compensate hypothetical future wages or guarantee full empty-return economics.
-
-## Manipulation resistance
-
-CGMP aims to reduce discretionary pricing surfaces:
-
-- published rates and parameter history;
-- server-side route/distance/time validation;
-- private sealed driver offers;
-- hidden passenger ceiling;
-- first-qualifying server-side clearing;
-- pre-authorized or explicit consent for exceptional charges;
-- telemetry-assisted review of repeated route stretching, deliberate crawling or repeated speeding;
-- two-sided review so unsupported chronic complaints can also be detected.
-
-The framework should be described as **manipulation-resistant**, not manipulation-proof.
-
-## Safety hypothesis
-
-Time compensation may reduce the economic pressure to maximize kilometres travelled per working hour, because congestion and lawful journey time are no longer entirely uncompensated.
-
-This is a **testable hypothesis**, not a proven safety outcome. A pilot should measure speeding events, complaints, excess journey time, cancellations, driver net earnings and passenger fares against a control system.
+1. **Distance pays for the vehicle; time pays for the human.**
+2. **Economic floors are protected before competitive tuning.**
+3. **Ordinary and expanded-search fares remain deterministic.**
+4. **Search radius and billing distance are separate:** search expands by bands, billing uses actual authorized pickup distance.
+5. **Scarcity price discovery is a last-resort mechanism, not a normal fare multiplier.**
+6. **Passengers control their private fallback affordability ceiling.**
+7. **Drivers control their private automated willingness-to-serve rules.**
+8. **Efficient drivetrains retain their savings; ICE class economics set the tariff benchmark.**
+9. **Fare-critical route, time, distance and fallback ordering should be server authoritative.**
+10. **Safety, strategic rejection, latency fairness and economic sustainability are empirical questions for simulation and pilots.**
 
 ## Repository layout
 
@@ -166,6 +198,10 @@ This is a **testable hypothesis**, not a proven safety outcome. A pilot should m
 │   └── cgmp.py
 ├── tests/
 │   └── test_cgmp.py
+├── preprint/
+│   ├── CGMP-v1.0-preprint.md
+│   ├── CGMP-v1.1-preprint.md
+│   └── ZENODO_SUBMISSION.md
 └── whitepaper/
     └── CGMP-v1.0-draft.md
 ```
@@ -176,30 +212,19 @@ This is a **testable hypothesis**, not a proven safety outcome. A pilot should m
 **Project maintainer / publication custodian:** gihan-kanishka  
 **AI assistance:** OpenAI ChatGPT (GPT-5.6 Sol)
 
-CGMP was developed through iterative human-AI collaboration. OpenAI ChatGPT was used extensively for formalization of the pricing and dispatch architecture, technical and economic analysis, literature synthesis, reference-code development, documentation, and manuscript drafting. Human contribution included conceptual direction, requirements, design decisions, review, and authorization of the public release.
+CGMP was developed through iterative human-AI collaboration. OpenAI ChatGPT was used extensively for formalization, analysis, literature synthesis, reference-code development, documentation and manuscript drafting. Human contribution included conceptual direction, requirements, design decisions, review and authorization of the public release.
 
 The AI system is not an author and cannot assume responsibility for the work. Publication responsibility remains with the human project maintainer. For citation purposes, use **CGMP Project** as the creator.
 
 ## Preprint
 
-A publication-oriented design preprint with literature review and references is available in [preprint/CGMP-v1.0-preprint.md](preprint/CGMP-v1.0-preprint.md).
+The current publication-oriented source is [preprint/CGMP-v1.1-preprint.md](preprint/CGMP-v1.1-preprint.md).
 
-The accompanying [Zenodo submission metadata](preprint/ZENODO_SUBMISSION.md) is prepared for a Publication / Preprint deposit.
+Zenodo metadata is maintained in [preprint/ZENODO_SUBMISSION.md](preprint/ZENODO_SUBMISSION.md).
 
 ## Licensing
 
-The software/reference implementation is licensed under **Apache License 2.0**.
-
-Unless a file states otherwise, the written specification, white paper, diagrams and documentation are made available under **Creative Commons Attribution 4.0 International (CC BY 4.0)**.
+Reference software: **Apache License 2.0**.  
+Documentation/specification/preprint unless otherwise stated: **CC BY 4.0**.
 
 See [LICENSING.md](docs/LICENSING.md).
-
-## Citation
-
-Citation metadata is provided in [CITATION.cff](CITATION.cff).
-
-## Contributions and implementations
-
-Independent research, criticism, recalibration, simulations and commercial implementations are welcome subject to the applicable licenses.
-
-Implementations should not market themselves as empirically validated CGMP deployments unless they publish sufficient evidence for the claim.
