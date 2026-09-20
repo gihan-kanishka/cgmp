@@ -1,44 +1,45 @@
-# Long-Distance and Displacement Policy - v1.2
+# Long-Distance Displacement Policy - v1.4
 
-## Principle
+## Threshold
 
-CGMP prices the outbound service. It does not guarantee a profitable round trip.
+The ordinary meter applies through the first 40 passenger kilometres. Long-distance displacement accrual begins only beyond 40 km.
 
-A long-distance provision may cover a defined necessary displacement cost when ordinary outbound distance/time compensation is insufficient to represent an unavoidable third-party or stay-related expense.
+```text
+eligible_long_distance_km = max(d_t - 40, 0)
+```
 
-## Potentially eligible provisions
+## Progressive marginal schedule
 
-Examples include:
+A deployment publishes contiguous marginal bands beginning at 40 km. Only kilometres inside a band earn that band's displacement amount.
 
-- an actual toll;
-- accommodation when immediate safe return is unreasonable;
-- a defined meal/stay allowance where published rules require it;
-- another published route-specific pass-through or provision.
+```text
+eligible_km_b = max(0, min(d_t, U_b) - L_b)
+I_progressive = sum_b(lambda_b * eligible_km_b)
+```
 
-## Not automatically compensated
+Exact v1.4 marginal values remain a calibration item. Before charging them, the deployment must publish the bands and rates.
 
-CGMP does not automatically add:
+The schedule must be monotonic and boundary-safe: adding distance must never reduce fare, and crossing a boundary must not retrospectively surcharge earlier kilometres.
 
-- full empty-return vehicle cost;
-- hypothetical future wages;
-- guaranteed round-trip profit;
-- discretionary after-the-fact claims.
+## Progressive display and reconciliation
 
-## Commission treatment
+The live long-distance amount is provisional. At trip completion the server determines the authoritative final amount from final distance and published route/destination eligibility rules.
 
-A long-distance provision must state whether it is:
+```text
+A_L = I_final - I_live
+F_final = F_meter + I_final
+```
 
-1. **commissionable fare**, or
-2. **commission-exempt pass-through**.
+Only the provisional long-distance component may be adjusted. Legitimate ordinary distance and time are not clawed back.
 
-Direct third-party costs such as actual tolls or explicitly reimbursed accommodation may be commission-exempt when separately disclosed.
+Driver-created lateness must not increase the long-distance treatment in a way that rewards delay on top of the time charge.
 
-## Dispatch sequence
+## One-day displacement principle
 
-Long-distance trips use the same three stages:
+The incentive does not guarantee empty-return economics. It compensates temporary displacement for up to one day while preserving the possibility of destination-area work or a paid return-direction trip.
 
-1. deterministic 0-2 km search;
-2. passenger-authorized deterministic 2 km search expansions;
-3. exceptional sealed fallback only after authorized expansion fails.
+Measure return-direction matches at 6, 12 and 24 hours, paid/unpaid postdropoff kilometres, and productive/idle postdropoff time.
 
-Any legitimate long-distance provision is incorporated into the relevant driver-specific deterministic baseline before fallback eligibility is evaluated.
+## Continuation integrity
+
+Immediate same-passenger/same-driver continuation must not trivially avoid the 40 km threshold. A deployment must publish a continuity rule for economically continuous journeys.
