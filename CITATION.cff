@@ -4,19 +4,21 @@ title: "Cost-Grounded Mobility Pricing (CGMP)"
 type: software
 authors:
   - name: "CGMP Project"
-version: "1.0-preprint"
+version: "1.1-preprint"
 date-released: "2026-09-20"
 repository-code: "https://github.com/gihan-kanishka/cgmp"
 url: "https://github.com/gihan-kanishka/cgmp"
 license: "Apache-2.0"
 abstract: >-
-  An open ride-hailing fare and market-clearing framework that uses a
-  cost-grounded normal tariff and a sealed-bid fallback when the baseline
-  fare does not attract a driver.
+  An open ride-hailing fare and dispatch framework with representative
+  ICE-based fare calibration, explicit driver-time compensation,
+  passenger-controlled progressive pickup search, and exceptional
+  first-qualifying sealed dispatch after deterministic expanded search fails.
 keywords:
   - ride-hailing
-  - mobility
-  - pricing
+  - mobility pricing
   - transport economics
+  - progressive search
   - sealed bidding
-  - fare design
+  - driver compensation
+  - market design
