@@ -21,6 +21,8 @@ Only after authorized deterministic expanded search fails may a private passenge
 
 v1.2 deliberately avoids adding preemptive premium caps, same-request rejecter bans, auction waiting windows, pickup-time fractions or latency handicaps. These are treated as empirical questions to be measured in simulation and pilots before additional complexity is introduced.
 
+An optional premium-driver planning module sits outside the core fare mechanism. Its only reference benefits are advance demand-pattern forecasts and priority access to scheduled trips; it does not change live-trip fares, commission, ordinary dispatch priority or Stage 3 treatment.
+
 ## 1. Design objective
 
 Ride-hailing systems simultaneously need to price ordinary transport, locate an acceptable vehicle, and handle requests that fail to attract supply.
@@ -256,7 +258,68 @@ CGMP does not automatically add full empty-return economics, hypothetical future
 
 Any provision must be disclosed before acceptance and incorporated into the candidate-specific deterministic baseline before fallback.
 
-## 10. Monitoring instead of speculative controls
+## 10. Optional driver-planning and scheduled-trip module
+
+CGMP v1.2 also documents an optional driver-planning module outside the core fare and live-dispatch mechanism.
+
+Premium driver membership has exactly two reference benefits:
+
+1. **advance demand-pattern forecasts**; and
+2. **priority access to scheduled-trip opportunities**.
+
+Premium membership does not change ordinary live-trip fares, commission, live dispatch priority, Stage 1 or Stage 2 treatment, or Stage 3 eligibility/clearing.
+
+### 10.1 Advance demand-pattern forecasts
+
+Premium drivers may receive future demand forecasts, including day-prior forecasts where sufficient information exists.
+
+Possible inputs include historical trip patterns, weather forecasts, school opening/closing times, scheduled train or other public-transport arrivals, major events, expected driver availability and already committed scheduled-trip capacity.
+
+Forecasts are probabilistic planning information, not guaranteed demand and not a passenger-fare multiplier.
+
+Where practical, the forecast should be supply-aware:
+
+```text
+expected opportunity
+    = expected demand
+    - expected available service capacity
+```
+
+This reduces the risk of encouraging too many drivers to reposition toward the same predicted opportunity.
+
+### 10.2 Scheduled-trip priority access
+
+Scheduled trips are first exposed to eligible premium drivers during a published premium-priority access window.
+
+If a scheduled trip remains unclaimed after that window, it is automatically forwarded to eligible regular drivers.
+
+Premium access is therefore priority access rather than exclusivity. The priority window is a deployment parameter and must not be configured in a way that jeopardizes assignment before the scheduled pickup time.
+
+### 10.3 Fair rotation of high-value long-distance scheduled trips
+
+Qualifying high-value long-distance scheduled trips use a 7-day fairness rotation.
+
+A driver who completed a qualifying trip during the previous 7 days is deprioritized while another otherwise eligible driver without a recent qualifying trip is available.
+
+The intended opportunity sequence is:
+
+```text
+premium drivers without a qualifying trip in the previous 7 days
+    ->
+regular drivers without a qualifying trip in the previous 7 days
+    ->
+recently served eligible drivers
+```
+
+Within an equivalent pool, the driver least recently served by a qualifying trip receives earlier opportunity.
+
+If no non-recent driver is available or accepts, the recent-trip restriction is relaxed so passenger fulfilment is not sacrificed.
+
+A production deployment must publish an objective and auditable definition of a qualifying high-value long-distance scheduled trip. v1.2 does not invent that distance/fare threshold before deployment evidence exists.
+
+Scheduled commitments should also be deducted from predicted future available capacity so the forecast does not count already committed drivers as freely available supply.
+
+## 11. Monitoring instead of speculative controls
 
 v1.2 treats the following as measurement questions:
 
@@ -282,7 +345,7 @@ A high fallback activation rate is not a success metric. It signals that baselin
 
 If a hypothesized problem is not materially present, no corrective rule should be added merely because it is theoretically possible.
 
-## 11. Focused simulation and pilot design
+## 12. Focused simulation and pilot design
 
 The first simulation should compare only a small number of material uncertainties:
 
@@ -296,7 +359,7 @@ A pilot should separately report paid passenger-trip earnings and online-hour ea
 
 Competitor benchmarking should use standardized trip distances across observed traffic/time-of-day conditions rather than only the 25 km/h illustration.
 
-## 12. Limitations
+## 13. Limitations
 
 The reference class cost values have not yet been backed by a published dated component dataset.
 
@@ -314,7 +377,7 @@ Explicit trip-time pricing may reduce some time pressure while creating an incen
 
 These are empirical limitations, not claims resolved by the specification.
 
-## 13. Conclusion
+## 14. Conclusion
 
 CGMP v1.2 retains a small operational core:
 
@@ -427,6 +490,42 @@ v1.2 therefore provides **no default premium or default ceiling**. A passenger w
 
 This keeps the affordability decision with the passenger rather than allowing the platform to normalize a particular scarcity premium.
 
+
+### A.13 What exactly does premium driver membership provide?
+
+Premium membership has exactly two reference benefits: **advance demand-pattern forecasts** and **priority access to scheduled-trip opportunities**.
+
+It does not change ordinary live-trip pricing, commission, live dispatch priority, Stage 1 or Stage 2 treatment, or Stage 3 eligibility/clearing.
+
+Scheduled trips not accepted during the premium-priority window are automatically forwarded to eligible regular drivers. Premium therefore means earlier access to future scheduled work, not exclusive access.
+
+### A.14 Why are high-profit long-distance scheduled trips rotated?
+
+A small number of drivers should not repeatedly capture the most profitable scheduled opportunities merely because they respond fastest or already hold premium membership.
+
+For qualifying high-value long-distance scheduled trips, a driver who completed a qualifying trip during the previous 7 days is temporarily deprioritized while another otherwise eligible driver without a recent qualifying trip is available.
+
+The intended order is:
+
+```text
+premium drivers without a recent qualifying trip
+    ->
+regular drivers without a recent qualifying trip
+    ->
+recently served eligible drivers
+```
+
+Within an equivalent pool, the least recently served driver receives earlier opportunity. If no other driver is available or accepts, the recent-trip restriction is relaxed.
+
+The qualifying threshold must be objective, published and auditable.
+
+### A.15 Why forecast demand instead of using passenger-price surge to reposition drivers?
+
+A demand forecast can help drivers decide where and when to work **before** a shortage appears, without changing passenger fares.
+
+Forecasts may use historical patterns and known future signals such as weather, school times, public-transport arrivals, events and scheduled commitments. They should be probabilistic and, where practical, adjusted for expected available supply.
+
+This is a planning layer rather than a scarcity-price multiplier. Stage 3 remains the exceptional mechanism for actual requests that deterministic dispatch cannot clear.
 
 ## References
 
