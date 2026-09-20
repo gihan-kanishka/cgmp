@@ -94,7 +94,7 @@ platform commission = 7%
 
 | Class | Provisional routine ICE cost/km | Target net headroom/km | Passenger distance rate |
 |---|---:|---:|---:|
-| Bike | Rs 14.50 | Rs 3 | Rs 19.00/km |
+| Bike | Rs 10.50 | Rs 3 | Rs 15.00/km |
 | Tuk | Rs 22.10 | Rs 12 | Rs 37.00/km |
 | Mini | Rs 32.80 | Rs 15 | Rs 51.50/km |
 | Compact | Rs 34.00 | Rs 15 | Rs 53.00/km |
@@ -126,7 +126,7 @@ For a 13 km passenger trip plus 2 km pickup at that reference trip speed, estima
 
 | Class | Estimated fare |
 |---|---:|
-| Bike | Rs 687.48 |
+| Bike | Rs 627.48 |
 | Tuk | Rs 957.48 |
 | Mini | Rs 1,174.98 |
 | Compact | Rs 1,197.48 |
@@ -136,7 +136,9 @@ The 25 km/h value is not a production pricing speed.
 
 ## 4. Economic calibration without hidden complexity
 
-The current ICE cost figures are provisional aggregate modelling assumptions.
+The current ICE cost figures are provisional. The Bike class has received a partial evidence-based recalibration, while the remaining classes are still provisional aggregate modelling assumptions.
+
+For Bike, the reference uses CPC Petrol 92 at Rs 399/litre and a deliberately conservative 60 km/l working fuel economy, producing Rs 6.65/km fuel cost. A provisional pooled non-fuel routine-wear reserve of Rs 3.85/km gives a total working Bike cost of Rs 10.50/km. The 60 km/l assumption is below manufacturer-reported 75-80 km/l figures for economical 100 cc commuter motorcycles to allow for pillion load, stop-start traffic and intensive ride-hailing use. The non-fuel reserve still requires dated fleet validation.
 
 A production deployment should publish the dated inputs used to derive:
 
