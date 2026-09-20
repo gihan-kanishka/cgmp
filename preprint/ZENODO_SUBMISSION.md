@@ -68,5 +68,7 @@ Allow Zenodo to assign a DOI at publication. If a DOI is reserved in advance, it
 
 - Design preprint; focused strategic simulation and live controlled-pilot validation pending.
 - Aggregate ICE cost inputs are provisional until dated component calibration is completed.
+- Vehicle-distance economic floor and competitive headroom are explicitly separated; published distance rates round upward to Rs 0.50/km.
+- Stage 3 has no platform-selected default premium or ceiling; a passenger rule must be explicitly chosen or saved.
 - Preprint/documentation license: CC BY 4.0.
 - Reference implementation license: Apache License 2.0.
