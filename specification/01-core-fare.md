@@ -1,108 +1,190 @@
-# CGMP Core Fare Specification
+# CGMP Core Fare Specification - v1.1
 
 ## 1. Purpose
 
-This document defines the ordinary fare calculation in CGMP.
+This document defines the ordinary CGMP fare and its calibration rules.
 
-The design objective is to derive a trip price from published, measurable inputs rather than continuously changing the price as a function of platform-estimated scarcity.
+CGMP separates three things that should not be silently mixed:
 
-## 2. Variables
+1. representative vehicle operating economics;
+2. driver labour compensation;
+3. competitive margin tuning above the economic floor.
+
+Scarcity does not alter the ordinary fare merely because demand is high.
+
+## 2. Ordinary fare
 
 Let:
 
-- `d_p` = chargeable pickup distance in km
-- `d_t` = passenger-trip distance in km
-- `r_c` = published distance rate for vehicle class `c`, in currency/km
-- `t` = chargeable passenger-trip duration in minutes
-- `r_t` = published time rate in currency/minute
-- `L` = any pre-agreed necessary long-distance displacement provision
-- `F` = passenger fare before optional taxes or legally required external charges
+- `d_t` = passenger-trip distance in km;
+- `d_p` = actual authorized pickup distance in km;
+- `D_min` = minimum passenger-trip distance;
+- `P_min` = included initial pickup distance;
+- `r_c` = passenger-facing distance rate for vehicle class `c`;
+- `t` = verified legitimate passenger-trip duration in minutes;
+- `r_t` = passenger-facing time rate;
+- `L` = pre-agreed long-distance displacement provision.
 
-The ordinary fare is:
-
-```text
-F = d_p * r_c + d_t * r_c + t * r_t + L
-```
-
-or equivalently:
+The v1.1 ordinary fare is:
 
 ```text
-F = (d_p + d_t) * r_c + t * r_t + L
+F =
+  [max(d_t, D_min) + max(d_p, P_min)] * r_c
+  + t * r_t
+  + L
 ```
 
-## 3. v1.0-draft modelling parameters
+Current reference settings:
 
-| Vehicle class | r_c |
+```text
+D_min = 2 km
+P_min = 2 km
+r_t   = Rs 12.90/min
+commission = 7%
+```
+
+Pickup time is not separately charged.
+
+## 3. Current passenger distance rates
+
+| Class | Passenger distance rate |
 |---|---:|
-| bike | Rs 30/km |
-| tuk | Rs 40/km |
-| mini | Rs 50/km |
-| compact | Rs 52.50/km |
-| sedan | Rs 55/km |
+| Bike | Rs 19.00/km |
+| Tuk | Rs 37.00/km |
+| Mini | Rs 51.50/km |
+| Compact | Rs 53.00/km |
+| Sedan | Rs 61.50/km |
 
-`r_t = Rs 12/minute`
+These are modelling outputs from the current cost and competitive-headroom assumptions, not permanent constants.
 
-These are modelling parameters for the Sri Lanka-oriented draft. They are not universal constants.
+## 4. ICE-based calibration
 
-## 4. Economic interpretation
+Passenger tariffs are calibrated from **representative ICE economics for each service class**.
 
-CGMP deliberately separates the distance and time components.
+EV or unusually efficient vehicle costs do not set the passenger tariff. Owners of more efficient vehicles retain the efficiency saving.
 
-- The distance component is intended to recover vehicle-use economics and vehicle-related risk.
-- The time component is intended to compensate active driver labour/time.
+Current provisional routine ICE cost assumptions:
 
-A short statement of the design principle is:
+| Class | Representative routine ICE cost/km |
+|---|---:|
+| Bike | Rs 14.50 |
+| Tuk | Rs 22.10 |
+| Mini | Rs 32.80 |
+| Compact | Rs 34.00 |
+| Sedan | Rs 36.10 |
 
-> Distance pays for the vehicle and its risks; time pays for the human.
+These inputs require empirical fleet validation.
 
-## 5. Transparency
+## 5. Competitive vehicle headroom
 
-The platform should expose the major fare components before acceptance whenever practical.
+The current target net vehicle headroom above routine ICE cost, **after commission**, is:
 
-For example:
+| Class | Target net headroom/km |
+|---|---:|
+| Bike | Rs 3 |
+| Tuk | Rs 12 |
+| Mini | Rs 15 |
+| Compact | Rs 15 |
+| Sedan | Rs 21 |
 
-```text
-Distance                    Rs 504
-Expected passenger time     Rs 516
-Pickup                      Rs  60
-Long-distance provision     Rs   0
-Estimated total             Rs1080
-```
-
-When traffic increases expected journey time, the UI should explain that the expected time component has increased. It should not describe this as scarcity pricing unless a separate market-clearing process is actually being used.
-
-## 6. Commission
-
-Platform commission is not part of the fare equation itself.
-
-For modelling, v1.0-draft uses a 7% commission:
+The calibration equation is:
 
 ```text
-driver_receipt = fare * (1 - commission_rate)
+raw passenger distance rate =
+  (routine ICE cost/km + target net vehicle headroom/km)
+  / (1 - commission)
 ```
 
-Operators may choose a different transparent commission rate.
+The reference implementation rounds upward to a transparent Rs 0.50 billing increment.
 
-## 7. Parameter governance
+These headrooms are **competitive calibration variables**. They may move as competitor passenger fares and market conditions change, but competitive tuning must not violate the economic floor.
 
-A production implementation should:
+## 6. Economic floor
 
-1. publish current rates;
-2. retain a public or auditable parameter-change history;
-3. state the data and methodology used for recalibration;
-4. avoid changing rates on a passenger-by-passenger willingness-to-pay basis;
-5. avoid silently using scarcity multipliers inside the ordinary fare calculation.
+Competition may determine how much room exists above cost. It does not determine whether CGMP is allowed to price below sustainable economics.
 
-## 8. Calibration concept
+At minimum, the calibration must preserve:
 
-The draft proposes that routine maintenance benchmarks be calibrated around **120% of the median routine/expected maintenance cost per kilometre among the majority fleet in each class**, with irregular/uninsured risk accounted for separately where appropriate.
+- representative ICE routine operating cost;
+- the published net labour target;
+- the transparent platform commission required to operate the service.
 
-This is a proposed calibration rule and requires empirical fleet data before production use.
+A deployment may add explicitly defined mandatory reserves to that floor once supported by empirical loss/repair data.
 
-## 9. Depreciation treatment
+The governance principle is:
 
-CGMP does not require market-value depreciation to be embedded directly in the fare.
+> Costs set the floor; competition sets how far above the floor the tariff can reasonably sit.
 
-In markets where vehicle resale values are heavily influenced by taxes, import rules, foreign-exchange conditions or policy shocks, a deployment may instead represent measurable physical wear using maintenance and replacement reserves.
+## 7. Labour rate
 
-Any deployment should state its depreciation/wear methodology explicitly.
+Current target net driver labour compensation is:
+
+```text
+Rs 12.00/minute after commission
+```
+
+Therefore:
+
+```text
+passenger time rate = 12 / 0.93 = approximately Rs 12.90/minute
+```
+
+At the 25 km/h reference speed used for examples:
+
+```text
+time equivalent per passenger-trip km
+= (60 / 25) * 12.90
+= Rs 30.96/km
+```
+
+This 25 km/h value is an estimation benchmark, not a forced production travel speed.
+
+## 8. Benchmark examples
+
+For a 13 km passenger trip with a 2 km pickup, reference trip time at 25 km/h is 31.2 minutes.
+
+| Class | Estimated passenger fare |
+|---|---:|
+| Bike | Rs 687.48 |
+| Tuk | Rs 957.48 |
+| Mini | Rs 1,174.98 |
+| Compact | Rs 1,197.48 |
+| Sedan | Rs 1,324.98 |
+
+For a 2 km passenger trip with up to 2 km pickup, the 25 km/h reference time is 4.8 minutes:
+
+| Class | Estimated minimum fare |
+|---|---:|
+| Bike | Rs 137.92 |
+| Tuk | Rs 209.92 |
+| Mini | Rs 267.92 |
+| Compact | Rs 273.92 |
+| Sedan | Rs 307.92 |
+
+Production fares use verified legitimate trip time.
+
+## 9. Competitive benchmarking
+
+Operators may compare standardized benchmark trips against competitor platforms, for example 2, 5, 10, 13 and 20 km trips under clearly stated time/pickup assumptions.
+
+Competitive observations may tune the class headroom, but they must not silently alter:
+
+- the underlying cost methodology;
+- the labour target;
+- commission disclosure;
+- minimum-distance or pickup rules;
+- scarcity rules.
+
+## 10. Transparency
+
+The passenger interface should make the causal components understandable:
+
+```text
+Passenger distance
+Passenger time
+Pickup distance
+Long-distance provision
+Estimated/final total
+```
+
+Traffic may increase the time component because it consumes legitimate driver time. That is different from a scarcity multiplier.
