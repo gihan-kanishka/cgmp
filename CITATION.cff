@@ -1,9 +1,9 @@
 cff-version: 1.2.0
-message: "If you use or study CGMP, please cite this repository and the relevant release."
+message: "If you use or study CGMP, please cite CGMP Project and the relevant release."
 title: "Cost-Grounded Mobility Pricing (CGMP)"
 type: software
 authors:
-  - name: "gihan-kanishka"
+  - name: "CGMP Project"
 version: "1.0-preprint"
 date-released: "2026-09-20"
 repository-code: "https://github.com/gihan-kanishka/cgmp"
