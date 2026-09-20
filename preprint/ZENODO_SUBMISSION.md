@@ -32,7 +32,7 @@ Only after authorized deterministic expanded search fails can a private passenge
 
 v1.2 deliberately avoids preemptive premium caps, rejecter bans, lowest-offer windows and latency handicaps. These remain monitoring and simulation questions unless empirical evidence demonstrates a material problem. Competitive headroom is adjusted only through scheduled review using standardized ordinary/non-scarcity competitor fares and may not cross the economic floor.
 
-An optional premium-driver planning module provides only advance demand-pattern forecasts and priority access to scheduled trips. Unclaimed scheduled trips flow to regular drivers. Qualifying high-value long-distance scheduled trips use a 7-day fairness rotation that deprioritizes recent recipients while other eligible drivers are available.
+An optional premium-driver planning module provides only advance demand-pattern forecasts and priority access to scheduled trips. Unclaimed scheduled trips flow to regular drivers. Qualifying high-value long-distance scheduled trips use a configurable fairness lookback, with 7 days as the v1.2 reference default; recent recipients are deprioritized while other eligible drivers are available.
 
 ## Keywords
 
@@ -72,5 +72,6 @@ Allow Zenodo to assign a DOI at publication. If a DOI is reserved in advance, it
 - Aggregate ICE cost inputs are provisional until dated component calibration is completed.
 - Vehicle-distance economic floor and competitive headroom are explicitly separated; published distance rates round upward to Rs 0.50/km.
 - Stage 3 has no platform-selected default premium or ceiling; a passenger rule must be explicitly chosen or saved.
+- The long-distance scheduled-trip fairness lookback is a published, versioned deployment parameter; 7 days is the v1.2 reference default.
 - Preprint/documentation license: CC BY 4.0.
 - Reference implementation license: Apache License 2.0.
