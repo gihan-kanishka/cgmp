@@ -32,6 +32,8 @@ Only after authorized deterministic expanded search fails can a private passenge
 
 v1.2 deliberately avoids preemptive premium caps, rejecter bans, lowest-offer windows and latency handicaps. These remain monitoring and simulation questions unless empirical evidence demonstrates a material problem. Competitive headroom is adjusted only through scheduled review using standardized ordinary/non-scarcity competitor fares and may not cross the economic floor.
 
+An optional premium-driver planning module provides only advance demand-pattern forecasts and priority access to scheduled trips. Unclaimed scheduled trips flow to regular drivers. Qualifying high-value long-distance scheduled trips use a 7-day fairness rotation that deprioritizes recent recipients while other eligible drivers are available.
+
 ## Keywords
 
 - ride-hailing
