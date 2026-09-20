@@ -30,6 +30,8 @@ Dispatch begins with a deterministic 0-2 km search. If no match is obtained, the
 
 Only after authorized deterministic expanded search fails can a private passenger ceiling and private automated driver offers be used. Because pickup differs by candidate, the deterministic baseline `F0_i` and resulting private ceiling `M_i` may be driver-specific. The first server-valid gross passenger-facing offer satisfying `F0_i <= b_i <= M_i` clears immediately.
 
+The Bike class was partially recalibrated using a conservative 60 km/l working fuel-efficiency assumption at Rs 399/litre Petrol 92, reducing its provisional routine cost to Rs 10.50/km and its published passenger distance rate to Rs 15.00/km. The pooled non-fuel wear reserve remains provisional pending fleet validation.
+
 v1.2 deliberately avoids preemptive premium caps, rejecter bans, lowest-offer windows and latency handicaps. These remain monitoring and simulation questions unless empirical evidence demonstrates a material problem. Competitive headroom is adjusted only through scheduled review using standardized ordinary/non-scarcity competitor fares and may not cross the economic floor.
 
 An optional premium-driver planning module provides only advance demand-pattern forecasts and priority access to scheduled trips. Unclaimed scheduled trips flow to regular drivers. Qualifying high-value long-distance scheduled trips use a configurable fairness lookback, with 7 days as the v1.2 reference default; recent recipients are deprioritized while other eligible drivers are available.
