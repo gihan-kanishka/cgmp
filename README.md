@@ -148,6 +148,35 @@ There is **no platform-selected default fallback premium or ceiling**. The passe
 
 No automatic rejecter ban, premium cap, latency correction or alternative auction window is part of the v1.2 core. Those are possible controls only if simulation or pilot evidence shows a material problem.
 
+## Optional premium driver planning
+
+The optional premium-driver product has exactly two benefits:
+
+1. **advance demand-pattern forecasts** for future time/area planning; and
+2. **priority access to scheduled-trip opportunities**.
+
+Premium membership does **not** change ordinary live-trip dispatch priority, live-trip fares, commission, or Stage 3 treatment.
+
+Scheduled trips are first exposed to eligible premium drivers for a published priority window. Unclaimed trips are then automatically forwarded to eligible regular drivers.
+
+For qualifying **high-value long-distance scheduled trips**, a 7-day fairness rotation applies. Drivers who completed a qualifying trip during the previous 7 days are deprioritized while another otherwise eligible driver without a recent qualifying trip is available. The intended opportunity order is:
+
+```text
+premium drivers without a qualifying trip in the previous 7 days
+    ->
+regular drivers without a qualifying trip in the previous 7 days
+    ->
+recently served eligible drivers
+```
+
+Within an equivalent pool, the least recently served driver receives earlier opportunity. If no other driver is available or accepts, the recent-trip restriction is relaxed so passenger fulfilment is not sacrificed.
+
+The exact qualifying long-distance/high-value threshold and premium-priority window are deployment parameters and must be published before production.
+
+Demand forecasts are planning information, not guarantees or price multipliers. Where practical, they should account for expected available supply and existing scheduled commitments so the system does not encourage unnecessary driver herding.
+
+See [specification/06-driver-planning-and-scheduled-trips.md](specification/06-driver-planning-and-scheduled-trips.md).
+
 ## Commission treatment
 
 The **7% commission applies to commissionable passenger fare**, including:
@@ -224,7 +253,8 @@ The 25 km/h figure is an estimation benchmark, not a production pricing speed.
 │   ├── 02-pickup-policy.md
 │   ├── 03-long-distance.md
 │   ├── 04-sealed-bidding.md
-│   └── 05-abuse-controls.md
+│   ├── 05-abuse-controls.md
+│   └── 06-driver-planning-and-scheduled-trips.md
 ├── simulator/
 │   └── cgmp.py
 ├── tests/
