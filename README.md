@@ -19,7 +19,7 @@ Passenger-facing rates are grossed up for a **7% platform commission**.
 
 | Class | Representative ICE routine cost/km | Current target net vehicle headroom/km | Passenger distance rate |
 |---|---:|---:|---:|
-| Bike | Rs 14.50 | Rs 3 | **Rs 19.00/km** |
+| Bike | Rs 10.50 | Rs 3 | **Rs 15.00/km** |
 | Tuk | Rs 22.10 | Rs 12 | **Rs 37.00/km** |
 | Mini | Rs 32.80 | Rs 15 | **Rs 51.50/km** |
 | Compact | Rs 34.00 | Rs 15 | **Rs 53.00/km** |
@@ -27,7 +27,7 @@ Passenger-facing rates are grossed up for a **7% platform commission**.
 
 Passenger-trip time rate: **Rs 12.90/minute**, yielding approximately **Rs 12.00/minute net to the driver after 7% commission**.
 
-The current routine ICE cost figures are provisional aggregate modelling assumptions. A production calibration must publish the dated component inputs used to derive them.
+The current routine ICE cost figures remain provisional. The Bike class has received a partial evidence-based recalibration: CPC Petrol 92 at Rs 399/litre and a deliberately conservative 60 km/l working efficiency imply Rs 6.65/km fuel cost; a provisional Rs 3.85/km pooled non-fuel routine-wear reserve produces Rs 10.50/km total. The non-fuel reserve still requires fleet validation. Other classes remain provisional aggregate modelling assumptions.
 
 ## Core fare
 
@@ -214,7 +214,7 @@ At **25 km/h**, Rs 12.90/min is equivalent to **Rs 30.96 per passenger-trip km**
 
 | Class | Distance component/km | Time equivalent/km | Effective trip rate/km |
 |---|---:|---:|---:|
-| Bike | Rs 19.00 | Rs 30.96 | **Rs 49.96** |
+| Bike | Rs 15.00 | Rs 30.96 | **Rs 45.96** |
 | Tuk | Rs 37.00 | Rs 30.96 | **Rs 67.96** |
 | Mini | Rs 51.50 | Rs 30.96 | **Rs 82.46** |
 | Compact | Rs 53.00 | Rs 30.96 | **Rs 83.96** |
@@ -224,7 +224,7 @@ For a **13 km trip + 2 km pickup** at the same 25 km/h reference trip speed:
 
 | Class | Estimated passenger fare |
 |---|---:|
-| Bike | **Rs 687.48** |
+| Bike | **Rs 627.48** |
 | Tuk | **Rs 957.48** |
 | Mini | **Rs 1,174.98** |
 | Compact | **Rs 1,197.48** |
