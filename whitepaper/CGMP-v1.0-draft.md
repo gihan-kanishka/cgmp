@@ -4,7 +4,10 @@
 
 **Version:** 1.0-draft  
 **Date:** 2026-09-20  
-**Status:** Design and simulation stage
+**Status:** Design and simulation stage  
+**Creator:** CGMP Project  
+**Project maintainer / publication custodian:** gihan-kanishka  
+**AI assistance:** OpenAI ChatGPT (GPT-5.6 Sol)
 
 ## Abstract
 
@@ -329,3 +332,12 @@ immediate assignment
 The framework's value does not depend on any single rupee-per-kilometre figure. Its contribution is the separation of ordinary trip economics from scarcity resolution, combined with configurable consent, auditable pricing inputs, private willingness limits and fast market clearing.
 
 Whether this architecture performs better than incumbent models is a question for empirical testing.
+
+
+## Attribution and AI-use disclosure
+
+**Formal creator:** CGMP Project. **Project maintainer and publication custodian:** gihan-kanishka.
+
+OpenAI ChatGPT (GPT-5.6 Sol) was used extensively for formalization of the pricing and dispatch architecture, technical and economic analysis, literature synthesis, reference-code development, documentation, and manuscript drafting. Human contribution included conceptual direction, requirements, design decisions, review, and authorization of the public release.
+
+The AI system is not an author and cannot assume responsibility for the work; publication responsibility remains with the human project maintainer. For citation purposes, use **CGMP Project** as the creator.
