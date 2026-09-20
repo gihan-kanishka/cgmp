@@ -1,37 +1,78 @@
 {
-  "version": "1.0-draft",
+  "version": "1.1-preprint",
   "currency": "LKR",
-  "distance_rates_per_km": {
-    "bike": 30.0,
-    "tuk": 40.0,
-    "mini": 50.0,
-    "compact": 52.5,
-    "sedan": 55.0
-  },
-  "time_rate_per_min": 12.0,
   "platform_commission_rate": 0.07,
-  "pickup": {
-    "reference_consent_threshold_km": 2.0,
-    "charge_time": false,
+  "calibration": {
+    "tariff_basis": "representative_ICE_class_economics",
+    "ignore_EV_costs_for_tariff_setting": true,
+    "rate_rounding_increment": 0.5,
+    "target_net_driver_labour_per_min": 12.0,
+    "passenger_time_rate_per_min": 12.9,
+    "reference_speed_kmph_for_examples": 25.0,
+    "classes": {
+      "bike": {
+        "routine_ICE_cost_per_km": 14.5,
+        "target_net_vehicle_headroom_per_km": 3.0,
+        "passenger_distance_rate_per_km": 19.0
+      },
+      "tuk": {
+        "routine_ICE_cost_per_km": 22.1,
+        "target_net_vehicle_headroom_per_km": 12.0,
+        "passenger_distance_rate_per_km": 37.0
+      },
+      "mini": {
+        "routine_ICE_cost_per_km": 32.8,
+        "target_net_vehicle_headroom_per_km": 15.0,
+        "passenger_distance_rate_per_km": 51.5
+      },
+      "compact": {
+        "routine_ICE_cost_per_km": 34.0,
+        "target_net_vehicle_headroom_per_km": 15.0,
+        "passenger_distance_rate_per_km": 53.0
+      },
+      "sedan": {
+        "routine_ICE_cost_per_km": 36.1,
+        "target_net_vehicle_headroom_per_km": 21.0,
+        "passenger_distance_rate_per_km": 61.5
+      }
+    },
+    "competitive_tuning": {
+      "enabled": true,
+      "tunable_field": "target_net_vehicle_headroom_per_km",
+      "hard_floor_must_be_preserved": true,
+      "benchmark_trip_distances_km": [2, 5, 10, 13, 20]
+    }
+  },
+  "minimum_fare": {
+    "minimum_passenger_trip_km": 2.0,
+    "included_initial_pickup_km": 2.0
+  },
+  "pickup_search": {
+    "initial_radius_km": 2.0,
+    "expansion_increment_km": 2.0,
+    "charge_pickup_time": false,
+    "bill_actual_authorized_pickup_distance": true,
     "passenger_standing_authorization": {
       "enabled": true,
       "max_pickup_distance_km": null,
       "max_pickup_cost": null,
-      "require_explicit_approval_if_outside_saved_limits": true
+      "max_auto_search_radius_km": null
     }
   },
   "sealed_bidding": {
     "enabled": true,
+    "activation_rule": "only_after_authorized_deterministic_expanded_search_fails",
     "passenger_max_hidden": true,
     "driver_bids_hidden": true,
     "selection_rule": "first_qualifying_bid",
     "qualifying_rule": "baseline_fare <= bid <= passenger_max",
     "clear_immediately": true,
     "authoritative_order": "server_receipt_order",
-    "passenger_saved_fallback_ceiling": {
-      "enabled": false,
-      "max_total_fare": null
-    },
+    "passenger_ceiling_modes": [
+      "percentage_above_base",
+      "fixed_amount_per_trip_km_above_base",
+      "fixed_fee_by_trip_distance_band"
+    ],
     "driver_auto_bid": {
       "enabled": true,
       "manual_numeric_bidding_while_moving": false,
