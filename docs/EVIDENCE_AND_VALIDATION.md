@@ -1,129 +1,84 @@
-# Evidence and Validation Plan - v1.2
+# Evidence and Validation Plan - v1.4
 
-CGMP v1.2 is a design framework, not a claim of proven superiority.
+CGMP v1.4 is a design framework, not a claim of proven superiority.
 
-The core mechanism is intentionally kept small. Uncertain behavioral problems are measured before corrective rules are added.
+## Cost calibration
 
-## Before production calibration
+Publish dated evidence for fuel, fuel economy, tyres, servicing, routine repairs/wear, representative fleet composition, the Rs 12/minute net passenger-time benchmark and direct platform costs relevant to 7% commission.
 
-Collect and publish dated evidence for:
+The working class costs remain provisional:
 
-- fuel prices by relevant fuel type;
-- representative ICE fuel economy by class;
-- tyre cost/life;
-- scheduled servicing;
-- brakes, suspension and routine repairs;
-- other routine wear included in the class cost;
-- fleet composition used to define a representative class;
-- the economic basis for the Rs 12/min net passenger-trip labour target;
-- direct platform operating costs relevant to the 7% commission.
+- Bike ~Rs 10.00/km
+- Tuk Rs 22.10/km
+- Mini Rs 32.80/km
+- Compact Rs 34.00/km
+- Sedan Rs 36.10/km
 
-Current aggregate ICE cost/km figures remain provisional until this breakdown exists.
+Individual vehicle efficiency savings remain with the driver and do not reset the class tariff.
 
-## Bike calibration validation
+## Current published rates
 
-The current Bike reference uses a provisional **Rs 10.50/km** routine cost based on:
+- Bike Rs 22/km
+- Tuk Rs 37/km
+- Mini Rs 52/km
+- Compact Rs 57/km
+- Sedan Rs 65/km
+- Passenger time Rs 12.90/minute
+- Platform commission 7%
 
-- Petrol 92: Rs 399/litre;
-- conservative loaded-urban working efficiency: 60 km/litre;
-- resulting fuel cost: Rs 6.65/km;
-- pooled non-fuel routine-wear reserve: Rs 3.85/km.
+## Competition validation
 
-The non-fuel reserve must be validated against dated high-mileage commuter-bike evidence for tyres, servicing/oil, chain and sprockets, brakes, suspension/repairs and other routine wear. The 60 km/l working assumption should also be checked against actual ride-hailing telemetry rather than manufacturer mileage alone.
+Use standardized ordinary/non-scarcity observations over multiple distances and observed traffic conditions. Do not use temporary competitor surge as a real-time calibration input.
 
-## Competitor calibration
+First Capital Research's March 2026 update reports approximate PickMe travel benchmarks of Rs 60/km Bike, Rs 75/km Tuk and Rs 100/km Wagon R. These are research benchmarks rather than guaranteed retail tariffs.
 
-Use standardized comparable **ordinary/non-scarcity** fares.
+Project-supplied field observations used in calibration, including competitor minimum charges and individual app quotes, must be re-sampled before being presented as market-wide facts.
 
-Do not use live competitor surge observations to make real-time CGMP changes.
+Also monitor driver-fee competition from subscription models; a 7% percentage fee is not automatically the lowest-cost model for high-volume drivers.
 
-Benchmark at multiple trip distances and observed traffic conditions rather than relying only on the 25 km/h illustration.
-
-Suggested distances:
-
-- 2 km;
-- 5 km;
-- 10 km;
-- 13 km;
-- 20 km.
-
-## Core pilot metrics
+## Pilot metrics
 
 ### Matching and pickup
 
-- initial 0-2 km match rate;
-- acceptance by pickup-distance band;
-- match rate after each expansion stage;
-- total request-to-match time;
-- time spent in each stage;
-- passenger abandonment/cancellation by stage;
+- match and acceptance rate by pickup distance and pickup minutes;
+- request-to-match time;
+- passenger abandonment;
 - actual pickup-distance distribution;
-- post-acceptance driver cancellation rate;
-- time from driver acceptance to driver cancellation;
-- passenger rematch/abandonment after driver cancellation.
-
-### Fallback
-
-- fallback activation rate;
-- fallback premium distribution;
-- clearing premium as a percentage of driver-specific `F0_i`;
-- clearing-offer proximity to `M_i`;
-- fallback failure rate;
-- request-to-fallback time;
-- fallback activation-to-assignment time;
-- reject-then-fallback participation;
-- network/device latency versus fallback win rate.
+- driver and passenger cancellation rates;
+- pickup cancellation compensation and no-show settlement.
 
 ### Economics
 
-- passenger fare per trip and per km;
-- driver net earnings per paid passenger-trip hour;
-- driver net earnings per online hour;
+- passenger fare per trip and kilometre;
+- driver contribution per paid passenger hour and online hour;
 - passenger-carrying utilization;
-- pickup time;
-- idle time;
-- platform contribution under 7% commission.
+- pickup and idle time;
+- platform contribution under 7%;
+- cash-ledger balances, settlement latency and threshold hits.
 
-The distinction between paid passenger-trip earnings and online-hour earnings must remain explicit.
+### Time and integrity
 
-### Forecasting and scheduled trips
+- expected vs actual passenger-trip time;
+- personal-stop pause frequency/duration;
+- unexplained excess time/distance;
+- route-stretching/meter-farming flags and dispute outcomes;
+- speeding/aggressive-driving indicators.
 
-- scheduled-trip fill rate;
-- premium-window fill rate;
-- share of scheduled trips forwarded to regular drivers;
-- time from scheduled-trip publication to commitment;
-- scheduled-trip cancellation/no-show rate;
-- distribution of qualifying high-value long-distance trips across eligible drivers;
-- fairness-rule override rate when no alternative driver is available;
-- concentration of qualifying trips by driver;
-- sensitivity of fairness and fulfilment outcomes to the configured fairness lookback `L_fair`;
-- forecast error by zone/time window;
-- forecast-driven repositioning;
-- effect of forecast-driven repositioning on later match rates;
-- driver herding or oversupply caused by forecasts.
+### Long distance
 
-### Time and safety
+- acceptance from 40 km onward;
+- provisional vs final long-distance adjustments;
+- return-direction matches within 6/12/24 hours;
+- paid/unpaid postdropoff kilometres;
+- productive/idle postdropoff time;
+- continuation/splitting detections;
+- destination and route-specific outcomes.
 
-- actual versus expected passenger-trip time;
-- unexplained excess journey time;
-- disputed time intervals;
-- speeding/aggressive-driving indicators;
-- slow-driving complaints.
+## Open calibration items
 
-## Simulation priorities
+Before production, publish numeric values for:
 
-A toy/agent-based simulation should test only the material uncertain mechanisms first:
-
-1. baseline acceptance versus reject-and-wait;
-2. fallback with and without same-request rejecter exclusion;
-3. first-qualifying clearing versus a short lowest-offer window comparator;
-4. unpaid pickup-time effects on Stage 2 acceptance;
-5. passenger abandonment as total matching time increases.
-
-The simulation should not be used to justify adding controls automatically. It should identify whether a problem is large enough to deserve additional complexity.
-
-## Decision rule
-
-If a problem is not materially present in simulation or pilot evidence, do not add a rule for it.
-
-That is the v1.2 anti-over-engineering principle.
+- progressive long-distance marginal bands/rates beginning after 40 km;
+- cash settlement threshold;
+- passenger cancellation grace interval;
+- no-show waiting rule.
