@@ -75,6 +75,21 @@ Suggested distances:
 
 The distinction between paid passenger-trip earnings and online-hour earnings must remain explicit.
 
+### Forecasting and scheduled trips
+
+- scheduled-trip fill rate;
+- premium-window fill rate;
+- share of scheduled trips forwarded to regular drivers;
+- time from scheduled-trip publication to commitment;
+- scheduled-trip cancellation/no-show rate;
+- distribution of qualifying high-value long-distance trips across eligible drivers;
+- fairness-rule override rate when no alternative driver is available;
+- concentration of qualifying trips by driver;
+- forecast error by zone/time window;
+- forecast-driven repositioning;
+- effect of forecast-driven repositioning on later match rates;
+- driver herding or oversupply caused by forecasts.
+
 ### Time and safety
 
 - actual versus expected passenger-trip time;
