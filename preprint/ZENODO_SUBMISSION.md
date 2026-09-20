@@ -10,7 +10,9 @@
 
 **Version:** v1.0
 
-**Creator / author:** [ENTER YOUR PREFERRED PUBLICATION NAME]
+**Creator:** CGMP Project
+
+**Creator type:** Organization / project
 
 **ORCID:** [OPTIONAL - ADD IF AVAILABLE]
 
@@ -19,6 +21,10 @@
 **License:** Creative Commons Attribution 4.0 International (CC BY 4.0)
 
 **Access:** Open
+
+**Project maintainer / publication custodian:** gihan-kanishka (not the formal creator)
+
+**AI assistance disclosure:** OpenAI ChatGPT (GPT-5.6 Sol) was used extensively for formalization, technical and economic analysis, literature synthesis, reference-code development, documentation, and manuscript drafting. Human contribution included conceptual direction, requirements, design decisions, review, and authorization of the public release. The AI system is not an author; publication responsibility remains with the human project maintainer.
 
 ## Abstract / description
 
