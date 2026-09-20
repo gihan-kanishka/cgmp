@@ -41,6 +41,20 @@ Instead, measure:
 
 A same-request exclusion rule may be tested later if evidence shows material gaming.
 
+## Post-acceptance cancellation and multi-homing
+
+Drivers may use multiple platforms. A driver can therefore accept a CGMP request and later cancel if another opportunity becomes more attractive.
+
+v1.2 does not add a platform-exclusivity rule. Instead, measure:
+
+- post-acceptance driver cancellation rate;
+- time from acceptance to driver cancellation;
+- repeated cancellation patterns by driver, area and time;
+- whether cancellations are concentrated in Stage 2 or Stage 3;
+- passenger rematch and abandonment after driver cancellation.
+
+These metrics can reveal reliability problems consistent with multi-homing without assuming the cause of every cancellation.
+
 ## First-qualifying latency
 
 Use an authoritative server ordering rule and measure the relationship between network/device latency and fallback wins.
