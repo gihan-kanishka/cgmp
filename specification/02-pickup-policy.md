@@ -1,64 +1,25 @@
-# Pickup and Search Policy - v1.2
+# Pickup, Search and Cancellation Policy - v1.4
 
-## 1. Initial search
+## Search
 
-CGMP first searches for eligible vehicles within **0-2 km**.
+- Stage 1: 0-2 km.
+- Expansion: passenger-authorized 2 km increments.
+- Search-band size controls candidate eligibility, not billing.
+- Pickup beyond 2 km is billed at actual authorized pickup distance.
+- Pickup time is not charged.
 
-The minimum-fare structure already includes 2 km of pickup distance.
+## Minimum pickup component
 
-## 2. Search expansion
+The reference meter contains a 2 km minimum pickup component. Together with the 2 km minimum passenger component it creates the minimum-service structure.
 
-If no match is obtained, search expands in fixed **2 km increments**:
+## Passenger cancellation
 
-```text
-0-2 km -> 2-4 km -> 4-6 km -> 6-8 km -> ...
-```
+Once the driver has materially begun pickup travel and the published grace rule has expired, passenger cancellation can debit the validated pickup component earned under the pickup rule and credit the driver.
 
-The passenger can approve expansion directly or store standing limits such as maximum automatic search radius or pickup cost.
+If the driver reaches pickup and the passenger cancels or no-shows, the full authorized pickup component may become payable under the published no-show rule.
 
-## 3. Pickup billing
+Driver-fault cancellation does not create a passenger pickup charge for the driver's fault. No passenger-trip distance or time is charged if the passenger trip never starts.
 
-Search radius and billing distance are separate.
+## Monitoring
 
-```text
-chargeable pickup km = max(actual authorized pickup km, 2)
-```
-
-A 3.2 km pickup is billed as 3.2 km, not 4 km.
-
-## 4. Pickup time
-
-**Pickup time is intentionally not charged in v1.2.**
-
-The passenger already bears the non-monetary cost of waiting before the service begins. CGMP compensates the vehicle movement through pickup distance but does not add a second monetary charge for pickup minutes.
-
-This is an explicit policy choice, not an assumption that pickup time has no value to the driver.
-
-The practical effect is measured through:
-
-- acceptance rate by pickup-distance band;
-- total request-to-match time;
-- passenger abandonment;
-- fallback activation rate.
-
-If evidence later shows a material problem, the policy can be revisited. No pickup-time fraction is added preemptively.
-
-## 5. Expanded search remains deterministic
-
-A farther search radius does not activate bidding.
-
-The ordinary CGMP fare remains in force during every passenger-authorized expansion stage.
-
-Sealed fallback becomes available only after authorized deterministic expansion fails.
-
-## 6. Integrity
-
-The platform should record:
-
-- search stage;
-- authorization state;
-- candidate pickup route;
-- actual pickup distance;
-- billed pickup distance.
-
-Server-calculated route distance, rather than a driver-controlled odometer value, should be the authoritative basis where practical.
+Measure acceptance against both pickup distance and pickup time, plus cancellation, no-show, rematch and abandonment outcomes.
