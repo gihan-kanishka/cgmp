@@ -1,53 +1,82 @@
-# First-Qualifying Sealed Dispatch
+# Exceptional First-Qualifying Sealed Dispatch - v1.1
 
 ## Purpose
 
-The sealed fallback is an exception path used when the published ordinary fare does not attract a willing driver.
+The sealed mechanism is a **last-resort exceptional dispatch path**.
 
-It is designed for **fast market clearing within a passenger-chosen affordability limit**, not for waiting through an auction window to discover the mathematically lowest offer.
+It is not activated merely because:
+
+- demand is high;
+- no vehicle exists inside the first 2 km;
+- the search radius expands;
+- a farther pickup costs more.
+
+Those cases remain deterministic CGMP pricing.
 
 ## Preconditions
 
-1. The trip is first offered at the normal CGMP baseline.
-2. No eligible driver accepts within the configured normal-dispatch process.
-3. The passenger has either set a private maximum total fare or enabled a saved fallback ceiling.
+Sealed bidding is eligible only when all of the following are true:
 
-## Privacy rules
+1. normal deterministic search has failed;
+2. the passenger has authorized one or more expanded-search stages, either interactively or through standing preferences;
+3. the authorized deterministic expanded-search process has failed to obtain a vehicle;
+4. the passenger has defined a private fallback affordability ceiling.
 
-During fallback dispatch:
+This distinction is central to CGMP.
 
-- the passenger maximum is hidden from drivers;
-- each driver's offer is hidden from other drivers;
-- drivers cannot react to competitors' offers;
-- the platform does not reveal a live clearing price;
-- the platform does not expose the passenger's willingness-to-pay ceiling.
+## Passenger ceiling
+
+The passenger, not the platform, defines the private maximum fallback allowance.
+
+Supported forms may include:
+
+1. **percentage above deterministic base**
+   ```text
+   M = F0 * (1 + p)
+   ```
+2. **fixed amount per passenger-trip km above base**
+   ```text
+   M = F0 + a * passenger_trip_km
+   ```
+3. **fixed additional fee by trip-distance band**
+   ```text
+   M = F0 + passenger_selected_band_fee
+   ```
+
+The platform should not reveal `M` to drivers.
 
 ## Driver-side automation
 
-Drivers should configure private fallback pricing rules during signup or while parked.
+Drivers configure private fallback rules during signup or while parked.
 
-Those rules may use inputs such as:
+Rules may consider:
 
-- estimated arrival time to the passenger;
-- pickup distance;
-- trip distance;
+- pickup ETA and distance;
+- passenger-trip distance;
 - expected trip duration;
-- road or terrain conditions;
+- road/terrain conditions;
 - destination;
 - time of day;
-- the driver's own minimum acceptable earnings or margin.
+- private minimum acceptable economics.
 
-When a fallback request arrives, the app or server may evaluate the driver's private rule and submit an offer automatically.
+A production implementation should not require numerical bidding while the driver is moving.
 
-A production implementation should not require a driver to type or evaluate numerical bids while actively operating a vehicle.
+## Privacy
+
+During fallback:
+
+- passenger ceiling is hidden from drivers;
+- driver offers are hidden from other drivers;
+- no live clearing price is revealed;
+- competing driver offers are not exposed.
 
 ## Selection rule
 
 Let:
 
-- `F0` = ordinary baseline fare;
-- `M` = passenger's private maximum total fare;
-- `b_i` = a server-valid driver offer received in authoritative order.
+- `F0` = deterministic CGMP base fare including authorized pickup and any rule-derived long-distance provision;
+- `M` = passenger's private maximum fare;
+- `b_i` = a server-valid private driver offer in authoritative receipt order.
 
 A bid qualifies when:
 
@@ -55,7 +84,7 @@ A bid qualifies when:
 F0 <= b_i <= M
 ```
 
-The **first qualifying offer received under the platform's authoritative dispatch-order rule immediately clears the trip**.
+The first qualifying offer clears immediately:
 
 ```text
 for each valid offer b_i in authoritative receipt order:
@@ -65,41 +94,45 @@ for each valid offer b_i in authoritative receipt order:
         stop
 ```
 
-The passenger pays the clearing offer, not automatically the maximum.
+The passenger pays the clearing offer, not automatically `M`.
 
-If no qualifying offer arrives within the fallback window, no match is produced. The passenger may voluntarily change the ceiling or try again.
+## Why first-qualifying is retained
 
-## Dispatch fairness and latency
+CGMP deliberately prioritizes dispatch speed only **after deterministic nearby and expanded searches have already failed**.
 
-Because the first qualifying offer wins, dispatch-order integrity matters.
+The mechanism therefore solves a recovery problem, not ordinary price discovery.
 
-A production implementation should:
+A later lower offer does not replace an already cleared assignment. The tradeoff should be measured empirically against latency, price and fairness outcomes.
 
-1. send the fallback opportunity to the relevant candidate group at effectively the same dispatch epoch where technically practical;
-2. use server-controlled receipt timestamps or another documented authoritative ordering mechanism;
-3. avoid intentionally advantaging selected drivers through staggered notification timing unless the dispatch policy explicitly requires it;
-4. monitor network-latency effects and publish or internally audit the ordering policy.
+## Dispatch fairness
 
-The goal is to optimize matching speed without turning hidden notification ordering into an undisclosed allocation mechanism.
+Because timing determines the winner, the implementation should:
 
-## Passenger-side automation
+1. deliver fallback opportunities to the relevant candidate group at effectively the same dispatch epoch where practical;
+2. use an authoritative server-side receipt/order mechanism;
+3. retain auditable event logs;
+4. measure whether network/device latency systematically affects win rates.
 
-A passenger may choose to store a private fallback ceiling in advance.
+## Strategic rejection
 
-When enabled, a failed baseline request can enter fallback dispatch immediately without requiring another passenger interaction, provided the resulting clearing fare stays within that private ceiling.
+A driver might theoretically reject deterministic work in hope of a later premium. CGMP does not assume this risk is zero.
 
-The app should still disclose the final fare and the fact that fallback dispatch was used.
+The design relies on several counterforces:
 
-## Anti-collusion monitoring
+- the deterministic fare is intended to provide viable economics;
+- the same trip may be taken by another driver;
+- the passenger may switch platforms or cancel;
+- fallback is reached only after authorized expansion fails.
 
-Sealed offers reduce direct price copying but do not eliminate collusion.
+A production pilot should measure rejection patterns and fallback activation rather than assuming either benign or strategic behavior.
 
-A deployment should monitor repeated coordinated baseline rejection, unusually synchronized pricing policies or offers, alternating-win patterns, and account/device relationships suggesting common control.
+A deployment may additionally prevent a driver who rejected a specific deterministic request from later bidding on that same request if evidence shows reject-and-wait gaming is material.
 
-Enforcement should rely on repeatable evidence rather than a single high offer.
+## Health metric
 
-## Design objective
+```text
+fallback activation rate =
+  trips entering sealed fallback / all ride requests
+```
 
-Scarcity affects price only after the ordinary baseline actually fails to clear the market.
-
-The passenger chooses the affordability boundary, drivers privately define the economics under which they are willing to serve the trip, and the system prioritizes immediate matching once those two conditions overlap.
+CGMP intends this rate to remain low. A high or rising rate is a signal to investigate baseline calibration, supply, search policy or strategic behavior.
