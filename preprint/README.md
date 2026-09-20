@@ -39,6 +39,19 @@ The v1.2 preprint includes **Appendix A: Frequently Raised Design Questions**, c
 
 The standalone repository version is available at `docs/DESIGN_QA.md`.
 
+## Optional premium-driver planning module
+
+v1.2 also documents an optional driver-planning module outside the core fare mechanism.
+
+Premium membership provides only:
+
+- advance demand-pattern forecasts; and
+- priority access to scheduled trips.
+
+It does not alter ordinary live-trip dispatch, fare, commission or Stage 3 treatment.
+
+Unclaimed scheduled trips flow to regular drivers. Qualifying high-value long-distance scheduled trips use a 7-day fairness rotation so recent recipients are deprioritized while other eligible drivers are available.
+
 ## Recommended publication path
 
 1. Run the focused v1.2 strategic simulation.
