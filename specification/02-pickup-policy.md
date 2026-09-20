@@ -1,77 +1,64 @@
-# Pickup and Search-Expansion Policy - v1.1
+# Pickup and Search Policy - v1.2
 
 ## 1. Initial search
 
-CGMP first searches for an eligible vehicle within **2 km**.
+CGMP first searches for eligible vehicles within **0-2 km**.
 
-The first 2 km of pickup is already represented in the minimum-fare structure, so no separate passenger confirmation is required for the initial 0-2 km search band.
-
-Pickup time is not separately charged in the current reference design.
+The minimum-fare structure already includes 2 km of pickup distance.
 
 ## 2. Search expansion
 
-If no match is obtained within the current search radius, the search expands in fixed **2 km increments**:
+If no match is obtained, search expands in fixed **2 km increments**:
 
 ```text
 0-2 km -> 2-4 km -> 4-6 km -> 6-8 km -> ...
 ```
 
-A passenger may:
+The passenger can approve expansion directly or store standing limits such as maximum automatic search radius or pickup cost.
 
-- approve the next expansion with one click; or
-- preconfigure automatic expansion up to a chosen radius and/or pickup-cost limit.
+## 3. Pickup billing
 
-Example:
-
-```text
-No nearby vehicle found.
-Expand search up to 4 km?
-Additional pickup distance may increase the fare.
-```
-
-## 3. Billing rule
-
-Search bands control **which drivers are considered**, not how pickup is billed.
-
-The passenger is charged the actual authorized pickup distance, subject to the included 2 km minimum:
+Search radius and billing distance are separate.
 
 ```text
 chargeable pickup km = max(actual authorized pickup km, 2)
 ```
 
-A driver 3.2 km away is billed as 3.2 km pickup, not 4 km.
+A 3.2 km pickup is billed as 3.2 km, not 4 km.
 
-## 4. Standing passenger authorization
+## 4. Pickup time
 
-Passengers may save preferences such as:
+**Pickup time is intentionally not charged in v1.2.**
 
-- maximum automatic search radius;
-- maximum pickup distance;
-- maximum pickup charge.
+The passenger already bears the non-monetary cost of waiting before the service begins. CGMP compensates the vehicle movement through pickup distance but does not add a second monetary charge for pickup minutes.
 
-If a candidate pickup satisfies the saved preferences, expansion may continue without another confirmation. The actual pickup distance and charge should still be disclosed.
+This is an explicit policy choice, not an assumption that pickup time has no value to the driver.
 
-## 5. Deterministic pricing during expansion
+The practical effect is measured through:
 
-Expanded-search trips remain priced using the ordinary deterministic CGMP fare.
+- acceptance rate by pickup-distance band;
+- total request-to-match time;
+- passenger abandonment;
+- fallback activation rate.
 
-**Search expansion does not activate bidding.**
+If evidence later shows a material problem, the policy can be revisited. No pickup-time fraction is added preemptively.
 
-The platform should continue attempting deterministic dispatch at the published fare, including the actual pickup charge and any legitimate pre-agreed long-distance provision.
+## 5. Expanded search remains deterministic
 
-## 6. Transition to sealed fallback
+A farther search radius does not activate bidding.
 
-Sealed bidding becomes eligible only after the passenger-authorized deterministic expanded-search process fails to obtain a vehicle.
+The ordinary CGMP fare remains in force during every passenger-authorized expansion stage.
 
-This makes sealed market clearing a last-resort recovery mechanism rather than a normal pricing stage.
+Sealed fallback becomes available only after authorized deterministic expansion fails.
 
-## 7. Integrity
+## 6. Integrity
 
-Pickup distance should be server-calculated from a reasonable/legal route and frozen or otherwise auditable at dispatch/acceptance.
+The platform should record:
 
-The system should distinguish clearly between:
-
-- search-radius ceiling;
+- search stage;
+- authorization state;
+- candidate pickup route;
 - actual pickup distance;
-- chargeable pickup distance;
-- passenger authorization state.
+- billed pickup distance.
+
+Server-calculated route distance, rather than a driver-controlled odometer value, should be the authoritative basis where practical.
