@@ -85,6 +85,7 @@ The distinction between paid passenger-trip earnings and online-hour earnings mu
 - distribution of qualifying high-value long-distance trips across eligible drivers;
 - fairness-rule override rate when no alternative driver is available;
 - concentration of qualifying trips by driver;
+- sensitivity of fairness and fulfilment outcomes to the configured fairness lookback `L_fair`;
 - forecast error by zone/time window;
 - forecast-driven repositioning;
 - effect of forecast-driven repositioning on later match rates;
