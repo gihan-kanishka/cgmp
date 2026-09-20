@@ -30,9 +30,17 @@
     "component_breakdown_status": "required_before_production; current aggregate class costs are provisional modelling assumptions",
     "classes": {
       "bike": {
-        "routine_ICE_cost_per_km": 14.5,
+        "routine_ICE_cost_per_km": 10.5,
         "target_net_vehicle_headroom_per_km": 3,
-        "passenger_distance_rate_per_km": 19
+        "passenger_distance_rate_per_km": 15,
+        "provisional_calibration_basis": {
+          "benchmark_vehicle": "economical_100_125cc_commuter_motorcycle",
+          "petrol_92_price_per_litre": 399,
+          "assumed_loaded_urban_fuel_economy_km_per_litre": 60,
+          "fuel_cost_per_km": 6.65,
+          "pooled_nonfuel_routine_wear_reserve_per_km": 3.85,
+          "status": "provisional; nonfuel reserve requires dated fleet validation"
+        }
       },
       "tuk": {
         "routine_ICE_cost_per_km": 22.1,
