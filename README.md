@@ -69,9 +69,21 @@ The repository does **not** invent a component breakdown for the current provisi
 
 EV and unusually efficient vehicle costs do not set the passenger tariff. Their owners retain the efficiency saving.
 
-## Competitive calibration
+## Economic floor and competitive calibration
 
-Class-specific vehicle headroom is a competitive tuning variable **above the economic floor**.
+For vehicle-distance pricing, define:
+
+```text
+R_floor_c = C_c / (1 - gamma)
+
+R_c = roundUp_0.50(
+        (C_c + H_c) / (1 - gamma)
+      )
+```
+
+where `C_c` is representative ICE routine economic cost/km, `H_c >= 0` is competitive headroom, and `gamma` is the platform commission rate.
+
+The published rate is rounded **upward to the next Rs 0.50/km**. Headroom is **not part of the economic floor**.
 
 Competitive recalibration must be:
 
@@ -132,6 +144,8 @@ F0_i <= b_i <= M_i
 
 The first server-valid qualifying offer clears immediately.
 
+There is **no platform-selected default fallback premium or ceiling**. The passenger must explicitly choose a private ceiling rule for the request or save one in advance. Without a passenger rule, Stage 3 is not activated.
+
 No automatic rejecter ban, premium cap, latency correction or alternative auction window is part of the v1.2 core. Those are possible controls only if simulation or pilot evidence shows a material problem.
 
 ## Commission treatment
@@ -160,7 +174,10 @@ v1.2 measures before adding corrective rules:
 - driver net earnings and utilization;
 - platform sustainability at 7%;
 - speeding/aggressive-driving indicators;
-- unexplained excess journey time.
+- unexplained excess journey time;
+- post-acceptance driver cancellation;
+- acceptance-to-cancellation time;
+- passenger rematch/abandonment after driver cancellation.
 
 ## Reference examples
 
