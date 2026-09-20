@@ -4,6 +4,7 @@ from simulator.cgmp import (
     DEFAULT_CLASSES,
     DEFAULT_TIME_RATE_PER_MIN,
     TARGET_NET_LABOUR_PER_MIN,
+    commission_amount,
     driver_receipt,
     effective_passenger_rate_per_trip_km,
     estimated_fare_at_reference_speed,
@@ -16,7 +17,7 @@ from simulator.cgmp import (
 )
 
 
-class TestCGMPv11(unittest.TestCase):
+class TestCGMPv12(unittest.TestCase):
     def test_published_distance_rates(self):
         expected = {
             "bike": 19.0,
@@ -56,6 +57,12 @@ class TestCGMPv11(unittest.TestCase):
         for name, fare in expected.items():
             self.assertEqual(ordinary_fare(name, 2, minutes, pickup_km=2), fare)
 
+    def test_pickup_time_is_not_charged(self):
+        self.assertEqual(
+            ordinary_fare("tuk", 5, 12, pickup_km=2),
+            ordinary_fare("tuk", 5, 12, pickup_km=2),
+        )
+
     def test_13km_reference_fares(self):
         expected = {
             "bike": 687.48,
@@ -83,14 +90,14 @@ class TestCGMPv11(unittest.TestCase):
         self.assertEqual(search_radius_for_stage(2), 4.0)
         self.assertEqual(search_radius_for_stage(3), 6.0)
 
-    def test_fallback_is_locked_before_expanded_search_failure(self):
+    def test_fallback_locked_before_expanded_search_failure(self):
         self.assertIsNone(
             first_qualifying_bid(
                 1000, 1300, [1100, 1050], deterministic_expanded_search_failed=False
             )
         )
 
-    def test_first_qualifying_bid_after_expansion_failure(self):
+    def test_first_qualifying_gross_bid_after_expansion_failure(self):
         self.assertEqual(
             first_qualifying_bid(
                 1000,
@@ -101,7 +108,7 @@ class TestCGMPv11(unittest.TestCase):
             1250.0,
         )
 
-    def test_passenger_ceiling_modes(self):
+    def test_driver_specific_passenger_ceiling_modes(self):
         self.assertEqual(passenger_ceiling(1000, 10, "percentage_above_base", 0.2), 1200)
         self.assertEqual(
             passenger_ceiling(1000, 10, "fixed_amount_per_trip_km_above_base", 10),
@@ -112,8 +119,13 @@ class TestCGMPv11(unittest.TestCase):
             1250,
         )
 
-    def test_commission(self):
+    def test_commission_on_commissionable_amount(self):
+        self.assertEqual(commission_amount(1000), 70.0)
         self.assertEqual(driver_receipt(1000), 930.0)
+
+    def test_pass_through_can_be_commission_exempt(self):
+        self.assertEqual(commission_amount(1100, commission_exempt_amount=100), 70.0)
+        self.assertEqual(driver_receipt(1100, commission_exempt_amount=100), 1030.0)
 
 
 if __name__ == "__main__":
