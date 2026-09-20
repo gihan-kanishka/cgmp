@@ -98,15 +98,25 @@ platform commission = 7%
 | Compact | Rs 34.00 | Rs 15 | Rs 53.00/km |
 | Sedan | Rs 36.10 | Rs 21 | Rs 61.50/km |
 
-The passenger distance rate is derived from:
+Let `C_c` be representative ICE routine economic cost/km, `H_c >= 0` competitive headroom/km, and `gamma` the platform commission rate.
+
+The vehicle-distance economic floor is:
 
 ```text
-(routine ICE cost/km + target net vehicle headroom/km)
-/
-(1 - commission)
+R_floor_c = C_c / (1 - gamma)
 ```
 
-and rounded upward to the published billing increment.
+The published passenger distance rate is:
+
+```text
+R_c = roundUp_0.50(
+        (C_c + H_c) / (1 - gamma)
+      )
+```
+
+where `roundUp_0.50` means round upward to the next **Rs 0.50/km** billing increment.
+
+Headroom is therefore **not part of the economic floor**. It is the competitive margin above the floor.
 
 At the 25 km/h reference speed used only for examples, the Rs 12.90/minute time component equals Rs 30.96 per passenger-trip kilometre.
 
@@ -197,6 +207,8 @@ Supported passenger ceiling rules may include:
 - fixed additional amount per passenger-trip kilometre;
 - fixed additional fee by trip-distance band.
 
+There is **no platform-selected default premium or default ceiling** in the v1.2 reference design. The passenger must explicitly choose a private ceiling rule for the request or save one in advance. If no passenger rule exists, Stage 3 is not activated. This avoids anchoring passengers to a platform-chosen scarcity premium.
+
 An offer qualifies when:
 
 ```text
@@ -261,7 +273,10 @@ v1.2 treats the following as measurement questions:
 - passenger-carrying utilization;
 - platform sustainability at 7%;
 - speeding/aggressive-driving indicators;
-- unexplained excess passenger-trip time.
+- unexplained excess passenger-trip time;
+- post-acceptance driver cancellation;
+- acceptance-to-driver-cancellation time;
+- passenger rematch or abandonment after driver cancellation.
 
 A high fallback activation rate is not a success metric. It signals that baseline calibration, supply, search design or strategic behavior should be investigated.
 
@@ -292,6 +307,8 @@ The sustainability of a 7% commission remains unproven.
 First-qualifying fallback may create premium drift or latency-related allocation differences.
 
 Pickup time may reduce driver willingness to accept expanded pickups even though it is intentionally not charged.
+
+Drivers may multi-home across platforms, creating post-acceptance cancellation and rematching risk. v1.2 treats this as an operational reliability metric rather than imposing platform exclusivity.
 
 Explicit trip-time pricing may reduce some time pressure while creating an incentive to prolong journeys.
 
@@ -347,9 +364,16 @@ The cause of the increase is therefore measurable trip time rather than a hidden
 
 ### A.5 If CGMP is cost-grounded, why can vehicle headroom change with competitor fares?
 
-Representative ICE operating economics and the labour target define the economic floor. Class-specific vehicle headroom is the competitive margin above that floor.
+For the vehicle-distance component, the floor is defined separately from headroom:
 
-Competitive calibration is allowed only through scheduled, versioned review using standardized ordinary/non-scarcity competitor fares. It must not become a real-time demand-sensitive price control and must not push the tariff below the economic floor.
+```text
+R_floor_c = C_c / (1 - gamma)
+R_c       = roundUp_0.50((C_c + H_c) / (1 - gamma))
+```
+
+`C_c` is representative ICE routine economic cost/km, `H_c >= 0` is competitive headroom, and `gamma` is the commission rate.
+
+Headroom is therefore **not part of the economic floor**. Competitive calibration may change `H_c`, but only through scheduled, versioned review using standardized ordinary/non-scarcity competitor fares. It must not become a real-time demand-sensitive price control or make the published rate fall below the floor.
 
 ### A.6 Why are EV operating costs not used to lower the class tariff?
 
@@ -394,6 +418,14 @@ v1.2 therefore follows a deliberate anti-over-engineering principle:
 > Measure uncertain behavioral problems before adding new pricing or dispatch rules.
 
 Premium caps, rejecter bans, auction waiting windows, pickup-time fractions and latency handicaps remain possible experimental controls, but they are not part of the reference mechanism unless simulation or pilot evidence demonstrates a material need.
+
+### A.12 Why is there no platform-selected default fallback ceiling?
+
+A platform-selected default such as "+20%" could become an anchor for both passengers and driver bidding strategies.
+
+v1.2 therefore provides **no default premium or default ceiling**. A passenger who wants Stage 3 must explicitly choose a private ceiling rule for that request or save one in advance. If no rule exists, fallback is not activated.
+
+This keeps the affordability decision with the passenger rather than allowing the platform to normalize a particular scarcity premium.
 
 
 ## References
