@@ -14,7 +14,7 @@ Historical source:
 
 - `CGMP-v1.0-preprint.md`
 
-Zenodo submission metadata is maintained in:
+Zenodo submission metadata:
 
 - `ZENODO_SUBMISSION.md`
 
