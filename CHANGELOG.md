@@ -1,5 +1,48 @@
 # Changelog
 
+## v1.2-preprint — 2026-09-20
+
+v1.2 is a simplification/governance revision. Core fare values are unchanged from v1.1.
+
+### Clarified core policy
+
+- Explicitly retained **no pickup-time charge**.
+- Documented the rationale: the passenger already bears pre-trip waiting, while pickup vehicle movement is compensated by distance.
+- Defined billable passenger-trip time as server-validated trip-start to trip-end time, excluding pickup.
+- Clarified that congestion may raise the deterministic fare through real trip time; the claim is **no automatic scarcity multiplier**, not "no multiplier of any kind."
+- Defined upfront fares in the reference model as estimates and the final fare as metered using verified passenger-trip time.
+
+### Calibration governance
+
+- Kept representative ICE economics as the tariff basis.
+- Added an explicit cost-component structure for fuel, tyres, servicing, routine repairs and wear.
+- Marked the current aggregate ICE cost figures as provisional until a dated empirical component breakdown is published.
+- Restricted competitive headroom tuning to **scheduled periodic review** using standardized ordinary/non-scarcity competitor fares.
+- Prohibited real-time competitor-price following.
+
+### Gross/net definitions
+
+- Defined deterministic baselines, passenger ceilings and fallback bids as **gross passenger-facing values**.
+- Defined driver-specific `F0_i` because pickup distance varies by candidate driver.
+- Defined `M_i` as the passenger's private rule applied to `F0_i`.
+- Applied 7% commission to distance, passenger-trip time and fallback premium.
+- Allowed separately identified direct third-party/pass-through costs to be commission-exempt.
+
+### Anti-over-engineering
+
+- Removed preemptive corrective controls from the reference core.
+- No automatic same-request rejecter ban.
+- No fallback premium cap.
+- No lowest-offer auction window.
+- No latency handicap.
+- These remain testable future controls only if evidence shows a material problem.
+- Expanded monitoring to include total request-to-match time, abandonment by stage, premium distributions, ceiling proximity and reject-then-fallback behavior.
+
+### Literature
+
+- Restored paper-by-paper positioning in the v1.2 preprint.
+- Corrected the Zhang et al. reference to the current INFORMS publisher citation status: *Marketing Science*, 0(0), published online 3 March 2026.
+
 ## v1.1-preprint — 2026-09-20
 
 ### Fare calibration
