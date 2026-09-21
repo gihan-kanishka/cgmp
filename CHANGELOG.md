@@ -1,5 +1,73 @@
 # Changelog
 
+## v1.4-preprint — 2026-09-21
+
+v1.4 is the current pre-pilot pricing, dispatch and settlement baseline.
+
+### Reference tariff
+
+- Set Bike to **Rs 22/km**.
+- Retained Tuk at **Rs 37/km**.
+- Set Mini to **Rs 52/km**.
+- Set Compact to **Rs 57/km**.
+- Set Sedan to **Rs 65/km**.
+- Retained passenger-trip time at **Rs 12.90/minute**.
+- Retained **7%** platform commission.
+- Retained the **2 km passenger-trip minimum component** and **2 km pickup minimum component**.
+- Confirmed that pickup time is not separately charged.
+- Added 25 km/h and 40 km/h reference calculations; these are illustrations only and production billing uses verified actual passenger-trip time.
+
+### Efficiency and class economics
+
+- Made the tariff explicitly class-based rather than vehicle-specific.
+- Individual fuel, maintenance, hybrid and EV efficiency savings remain with the driver.
+- Reframed class headroom as margin above the representative economic floor for competition, vehicle-capital differences, working conditions and occupational exposure.
+
+### Dispatch
+
+- Removed the sealed driver-bidding fallback from the v1.4 reference design.
+- Retained deterministic passenger-authorized search expansion in **2 km increments**.
+- If authorized search fails, the request may remain unmatched or retry/rematch at the same published tariff rather than introducing a scarcity premium.
+
+### Cancellation and personal stops
+
+- Added passenger-cancellation pickup settlement after meaningful driver deployment and expiry of a published grace rule.
+- Driver-fault cancellation does not create a passenger pickup charge for the driver's fault.
+- Added explicit driver-personal-stop billing pause with visible notification to both parties.
+- Personal-stop time and clear driver-personal detour distance are excluded from passenger billing.
+- Passenger-requested waiting and legitimate traffic remain billable.
+
+### Meter integrity
+
+- Added server-authoritative pause-state, timestamp, route/GPS and anomaly logging requirements.
+- Added repeated route-stretching/meter-farming pattern detection while avoiding the assumption that one unusual slow trip proves abuse.
+
+### Long-distance redesign
+
+- Restored long-distance qualification to **after 40 passenger km**.
+- Replaced retrospective whole-trip threshold repricing with **progressive marginal per-kilometre accrual**.
+- The first 40 passenger kilometres remain ordinary CGMP service.
+- Long-distance accrual is provisional during the trip and reconciled at completion.
+- Only the long-distance component can be adjusted at reconciliation; legitimate ordinary distance/time is not clawed back.
+- Added a monotonicity/boundary invariant: additional distance must not reduce fare and band transitions must not retrospectively surcharge earlier kilometres.
+- Added same-passenger/same-driver continuation detection to address artificial trip splitting around 40 km.
+- Retained the one-day displacement principle and 6/12/24-hour return-direction measurement.
+- Exact progressive marginal long-distance rates remain an empirical calibration item before live charging.
+
+### Cash commission settlement
+
+- Added a driver cash-commission ledger.
+- Cash fares create platform commission debt equal to the applicable 7% commission.
+- Electronic-trip proceeds or direct settlement may reduce the balance.
+- New cash jobs are restricted at a published settlement threshold while electronic work may remain available to reduce debt.
+- The numeric threshold remains a deployment/pilot calibration item.
+
+### Validation
+
+- Expanded pilot metrics to include pickup acceptance by distance and time, cancellation/no-show outcomes, personal-stop pauses, meter-farming patterns, cash-ledger settlement, provisional/final long-distance adjustments, trip splitting, postdropoff utilization and return-direction matching.
+- Reaffirmed that platform sustainability at 7%, representative class costs and the Rs 12/minute net passenger-time labour benchmark remain empirical questions.
+- Legal/regulatory compatibility remains a pre-deployment requirement.
+
 ## v1.2-preprint — 2026-09-20
 
 v1.2 is a simplification/governance revision with one calibration correction: the Bike class was recalibrated after reviewing commuter-motorcycle fuel efficiency.
