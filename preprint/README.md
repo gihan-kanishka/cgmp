@@ -4,14 +4,15 @@ This directory contains publication-oriented CGMP design preprints.
 
 ## Current version
 
-**CGMP v1.2-preprint** is the current working publication version.
+**CGMP v1.4-preprint** is the current working publication version.
 
 Primary source:
 
-- `CGMP-v1.2-preprint.md`
+- [`CGMP-v1.4-preprint.md`](./CGMP-v1.4-preprint.md)
 
 Historical sources:
 
+- `CGMP-v1.2-preprint.md`
 - `CGMP-v1.1-preprint.md`
 - `CGMP-v1.0-preprint.md`
 
@@ -19,43 +20,42 @@ Zenodo submission metadata:
 
 - `ZENODO_SUBMISSION.md`
 
-## v1.2 focus
+## v1.4 focus
 
-v1.2 keeps the v1.1 fare calibration and three-stage dispatch architecture but removes pressure to solve every hypothetical behavioral problem in advance.
+v1.4 replaces the earlier reference tariff and fallback architecture with the current pre-pilot design:
 
-It adds only the definitions needed to make the core reproducible:
+- Bike **Rs 22/km**
+- Tuk **Rs 37/km**
+- Mini **Rs 52/km**
+- Compact **Rs 57/km**
+- Sedan **Rs 65/km**
+- passenger-trip time **Rs 12.90/minute**
+- platform commission **7%**
+- **2 km** minimum passenger-trip component
+- **2 km** minimum pickup component
+- no pickup-time charge
+- no automatic demand/supply surge multiplier
+- no discretionary driver-bidding fallback
+- passenger-authorized pickup search in 2 km increments
+- passenger-cancellation pickup compensation under published grace/no-show rules
+- visible billing pause for driver personal stops
+- class-based tariffs where individual efficiency savings remain with the driver
+- progressive long-distance displacement treatment beginning after **40 passenger km**
+- end-of-trip reconciliation limited to the provisional long-distance component
+- cash-commission ledger with a published settlement threshold
 
-- pickup time is explicitly not charged;
-- ICE class costs require a dated component breakdown before production;
-- competitive headroom is reviewed periodically using ordinary/non-scarcity competitor fares;
-- billable passenger-trip time is operationally defined;
-- `F0_i`, `M_i` and `b_i` are explicitly gross passenger-facing, driver-specific where pickup differs;
-- commission treatment is explicit;
-- uncertain strategic/latency/premium issues remain monitoring and simulation questions.
+Exact long-distance marginal rates, cancellation grace/no-show timing and the cash settlement threshold remain pilot/deployment calibration items.
 
-## Design Q&A appendix
+## Recommended validation path
 
-The v1.2 preprint includes **Appendix A: Frequently Raised Design Questions**, covering pickup-time policy, first-qualifying fallback, reject-and-wait behavior, congestion versus scarcity, competitive headroom, EV treatment, paid-minute versus online-hour earnings, fallback premium drift, Stage 3 availability limits, 7% commission sustainability, and the anti-over-engineering principle.
+1. Freeze the ordinary tariff for controlled pilot testing.
+2. Publish the progressive post-40 km long-distance schedule before charging it.
+3. Validate representative class-cost inputs with dated component evidence.
+4. Measure pickup acceptance by both distance and time.
+5. Measure driver paid-trip earnings and whole online-hour earnings separately.
+6. Measure platform sustainability at 7% commission.
+7. Measure return-direction matching and post-dropoff utilization at 6, 12 and 24 hours.
+8. Validate meter-integrity, personal-stop, cancellation and cash-ledger controls before broad deployment.
+9. Complete local legal/regulatory review before commercial deployment.
 
-The standalone repository version is available at `docs/DESIGN_QA.md`.
-
-## Optional premium-driver planning module
-
-v1.2 also documents an optional driver-planning module outside the core fare mechanism.
-
-Premium membership provides only:
-
-- advance demand-pattern forecasts; and
-- priority access to scheduled trips.
-
-It does not alter ordinary live-trip dispatch, fare, commission or Stage 3 treatment.
-
-Unclaimed scheduled trips flow to regular drivers. Qualifying high-value long-distance scheduled trips use a 7-day fairness rotation so recent recipients are deprioritized while other eligible drivers are available.
-
-## Recommended publication path
-
-1. Run the focused v1.2 strategic simulation.
-2. Complete the empirical ICE cost component table and labour-benchmark derivation.
-3. Publish the v1.2 design preprint on Zenodo under CC BY 4.0.
-4. Keep reference software under Apache-2.0.
-5. Follow with controlled operator pilot evidence before making superiority or safety claims.
+Reference software remains Apache-2.0. Documentation/specification/preprint remains CC BY 4.0 unless otherwise stated.
